@@ -68,7 +68,7 @@ class Provider(models.Model):
         url_corp = models.CharField(_('url'), max_length=250, blank=True)
         feeds = models.CharField(_('feeds'), max_length=250, blank=True)
         company = models.ForeignKey(Company, null=True, on_delete=models.SET_NULL)
-#        ingredients = models.ManyToManyField('Ingredient')
+
 
         def __str__(self):
             return self.name
@@ -104,3 +104,97 @@ class Restaurant(models.Model):
                 'id': self.id
             })
 
+class Ingredient(models.Model):
+
+    GRAM = "gram"
+    UNIT = "unit"
+    MILLILITER = "milliliter"
+    KILOGRAM = "kilogram"
+
+    PRESENTATION_CHOICES = [
+        (GRAM, "Gram"),
+        (UNIT, "Unit"),
+        (MILLILITER, "Milliliter"),
+        (KILOGRAM, "Kilogram")
+    ]
+
+    GROCERY = "grocery"
+    PROTEIN = "protein"
+    FRUVER = "fruVer"
+    CATEGORY_CHOICES = [
+        (GROCERY, "Grocery"),
+        (PROTEIN, "Protein"),
+        (FRUVER, "FruVer")
+    ]
+
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(_('name'),max_length=250)
+    type = models.CharField(_('type'),max_length=50,choices=CATEGORY_CHOICES, default=GROCERY)
+    presentation = models.CharField(_('presentation'),max_length=50,choices=PRESENTATION_CHOICES, default=GRAM)
+    created_on = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(_('description'),max_length=999)
+    price = models.DecimalField(max_digits=20, decimal_places=10)
+    qty = models.DecimalField(max_digits=20, decimal_places=10)
+    chef = models.ForeignKey(get_user_model(), related_name='ingredient_chef', on_delete=models.CASCADE)
+    merma = models.DecimalField(max_digits=10,decimal_places=6, default=0.1)
+    provider = models.ForeignKey(Provider, related_name='ingredient_provider', on_delete=models.CASCADE)
+
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('Ingredient:detail', kwargs={
+            'id': self.id
+        })
+
+
+class Receta(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(_('name'),max_length=100)
+    description = models.CharField(_('description'),max_length=250,blank=True)
+    isComplete = models.BooleanField(default=False)
+    cost = models.DecimalField(max_digits=20, decimal_places=10)
+    portions = models.DecimalField(max_digits=20, decimal_places=10, default=1.0)
+    mpcost = models.DecimalField(max_digits=20, decimal_places=10,blank=True)
+    prepacost = models.DecimalField(max_digits=20, decimal_places=10,blank=True)
+    portioncost = models.DecimalField(max_digits=20, decimal_places=10,blank=True)
+    mpestablish = models.DecimalField(max_digits=20, decimal_places=10,blank=True)
+    errormargin = models.DecimalField(max_digits=20, decimal_places=10,blank=True)
+    realratemp  = models.DecimalField(max_digits=20, decimal_places=10,blank=True)
+    saleprice = models.DecimalField(max_digits=20, decimal_places=10,blank=True)
+    menuprice = models.DecimalField(max_digits=20, decimal_places=10,blank=True)
+    realsaleprice = models.DecimalField(max_digits=20, decimal_places=10,blank=True)
+    taxportion = models.DecimalField(max_digits=20, decimal_places=10,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    restaurant = models.ForeignKey(Restaurant, null=True, on_delete=models.SET_NULL)
+    items = models.ManyToManyField(Ingredient, through='Steps',through_fields=('receta','ingredient'))
+    chef = models.ForeignKey(get_user_model(), related_name='receta_chef', null=True, on_delete=models.SET_NULL)
+
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('Receta:detail', kwargs={
+            'id': self.id
+        })
+
+
+class Steps(models.Model):
+   id = models.AutoField(primary_key=True)
+   receta = models.ForeignKey(Receta,related_name='steps_receta',on_delete=models.CASCADE)
+   ingredient = models.ForeignKey(Ingredient,related_name='steps_ingredient' ,on_delete=models.CASCADE)
+   qty = models.DecimalField(max_digits=20,decimal_places=10)
+   preparacion = models.CharField(max_length=250)
+   merma = models.DecimalField(max_digits=10,decimal_places=6)
+
+
+   def __str__(self):
+        return self.preparacion
+
+   def get_absolute_url(self):
+        return reverse('Step:detail', kwargs={
+            'id': self.id
+        })
