@@ -54,3 +54,62 @@ class ProviderForm(forms.ModelForm):
             'url_corp',
             'feeds'
         ]
+
+
+class RestaurantForm(forms.ModelForm):
+    class Meta:
+        model = Restaurant
+        fields = [
+            'name',
+            'description',
+            'address',
+            'city',
+            'state',
+            'contacto',
+            'notes',
+            'email',
+            'url_corp',
+            'feeds',
+            'providers',
+            'chefs'
+        ]
+
+
+class IngredientForm(forms.ModelForm):
+    class Meta:
+        model = Ingredient
+        fields = [
+            'name',
+            'description',
+            'presentation',
+            'type',
+            'price',
+            'qty',
+            'merma'
+
+        ]
+
+class RecetaForm(forms.ModelForm):
+
+    class Meta:
+        model = Receta
+        fields = [
+            'chef',
+            'restaurant',
+            'name',
+            'description',
+            'portions',
+            'items',
+        ]
+
+
+
+class StepsForm(forms.ModelForm):
+    class Meta:
+        model = Steps
+        fields = [
+            'preparacion',
+            'merma',
+            'qty'
+
+        ]
