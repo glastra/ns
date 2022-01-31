@@ -1,0 +1,12 @@
+{% extends 'costos/base.html' %}
+{% load i18n %}
+{%load static %}
+{% block meta_desc %} A&B Cost {% endblock %}
+{% block title %} A&B Cost - Provider {% endblock %}
+{%block content %}
+<h2>All Provider </h2>
+  {% for object in object_list %}
+      <li >{{object.name}}</li>
+
+  {% endfor %}
+{% endblock %}}
