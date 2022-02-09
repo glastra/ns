@@ -1,10 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Index</title>
-</head>
-<body>
-
-</body>
-</html>
+{% extends 'costos/base.html' %}
+{% load i18n %}
+{%load static %}
+{% block meta_desc %} A&B Cost {% endblock %}
+{% block title %} A&B Cost {% endblock %}
+{%block content %}
+<h1>{% translate "name" %}</h1>
+   <p>{% translate "description" %}</p>
+    {% get_current_language as CURRENT_LANGUAGE %}
+      {% get_available_languages as AVAILABLE_LANGUAGES %}
+      {% get_language_info_list for AVAILABLE_LANGUAGES as languages %}
+      <div class="languages">
+        <p>{% translate "Language" %}:</p>
+        <ul class="languages">
+          {% for language in languages %}
+            <li>
+              <a href="/{{ language.code }}/"
+                {% if language.code == CURRENT_LANGUAGE %} class="active"{% endif %}>
+                {{ language.name_local }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+{% endblock %}}
