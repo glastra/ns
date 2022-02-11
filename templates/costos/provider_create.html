@@ -5,11 +5,37 @@
 {% block meta_desc %} A&B Cost {% endblock %}
 {% block title %} A&B Cost - Provider {% endblock %}
 {%block content %}
- <form method="post">
-    {% csrf_token %}
-    <table>{{ form | crispy}}</table>
-    <button type="submit">Sign in</button>
-  </form>
+  <div class="text-center">
+   <h1 class="h4 text-gray-900 mb-4">Add Provider</h1>
+ </div>
+ <body class="bg-gradient-primary">
+  <div class="container">
+   <div class="row justify-content-center">
+     <div class="col-xl-10 col-lg-12 col-md-9">
+       <div class="card o-hidden border-0 shadow-lg my-5">
+         <div class="card-body p-3">
+           <div class="form-group">
+             <form method="post" >
+                {% csrf_token %}
+                <table>{{ form | crispy}}</table>
+                <button type="submit">Submit</button>
+             </form>
+            </div>
+         </div>
+       </div>
+     </div>
+   </div>
+  </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
+
+</body>
 {% endblock %}}
-
-

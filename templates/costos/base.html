@@ -66,10 +66,9 @@
                 <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">New</h6>
-                        <a class="collapse-item" href="/receta/add">Receta</a>
-                        <a class="collapse-item" href="/ingredient/add">Ingredient</a>
-                        <a class="collapse-item" href="/provider/add">Provider</a>
-
+                        <a class="collapse-item" href="{% url 'receta_create' %}">Receta</a>
+                        <a class="collapse-item" href="{% url 'ingredient_create' %}">Ingredient</a>
+                        <a class="collapse-item" href="{% url 'provider_create' %}">Provider</a>
                     </div>
                 </div>
             </li>
@@ -100,27 +99,27 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Configuration:</h6>
-                        <a class="collapse-item" href="#">Cost</a>
-                        <a class="collapse-item" href="#">Account</a>
+                        <a class="collapse-item" href="{% url 'restaurant_create' %}">Restaurant</a>
+                        <a class="collapse-item" href="{% url 'company_create' %}">Company</a>
                     </div>
                 </div>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="/register">
+                <a class="nav-link" href="{% url 'register' %}">
                     <i class="fas fa-user-plus"></i>
                     <span>Sign Up</span></a>
             </li>
 
 
             <li class="nav-item">
-                <a class="nav-link" href="/login">
+                <a class="nav-link" href="{% url 'login' %}">
                     <i class="fas fa-sign-in-alt"></i>
                     <span>Login</span></a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="/forgot-password">
+                <a class="nav-link" href="{% url 'forgot_password' %}">
                     <i class="fas fa-unlock-alt"></i>
                     <span>Forgot Password</span></a>
             </li>

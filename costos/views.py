@@ -100,7 +100,7 @@ def provider_detail(request, pk):
 
 
 def provider_create(request):
-    form = IngredientForm(request.POST or None)
+    form = ProviderForm(request.POST or None)
     if form.is_valid():
         form.save()
     context = {
@@ -175,7 +175,7 @@ def register(request):
 
 
 def forgot_password(request):
-   return render(request, 'costos/forgot-password.html')
+   return render(request, 'costos/forgot_password.html')
 
 class CompanyListView(ListView):
     model = Company
