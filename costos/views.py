@@ -198,3 +198,6 @@ def company_detail(request, pk):
 
          return redirect('provider_list')
      return render(request, 'costos/company_detail.html', {'company': company})
+
+def dashboard(request):
+     return render(request, 'costos/dashboard.html')
