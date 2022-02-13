@@ -15,7 +15,11 @@ from .forms import RestaurantForm
 from .forms import IngredientForm
 from .forms import RecetaForm
 from .forms import Receta
+from .forms import RegistrationForm
+from formtools.wizard.views import WizardView
 # Create your views here.
+
+
 
 def index(request):
     return render(request, 'costos/index.html')
@@ -171,7 +175,16 @@ def login(request):
 
 
 def register(request):
-   return render(request, 'costos/register.html')
+    if request.method == "POST":
+        form = RegistrationForm(request.POST)
+        print(request.POST)
+        if form.is_valid():
+            form.save()
+            print('saved')
+            return redirect("/index")
+    print('could not save')
+    form = RegistrationForm()
+    return render(request, "costos/accounts/register.html", {"form":form})
 
 
 def forgot_password(request):

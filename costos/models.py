@@ -185,7 +185,7 @@ class Receta(models.Model):
 class Steps(models.Model):
    id = models.AutoField(primary_key=True)
    receta = models.ForeignKey(Receta,related_name='steps_receta',on_delete=models.CASCADE)
-   ingredient = models.ForeignKey(Ingredient,related_name='steps_ingredient' ,on_delete=models.CASCADE)
+   ingredient = models.ForeignKey(Ingredient,related_name='steps_ingredient',on_delete=models.CASCADE)
    qty = models.DecimalField(max_digits=20,decimal_places=10)
    preparacion = models.CharField(max_length=250)
    merma = models.DecimalField(max_digits=10,decimal_places=6)

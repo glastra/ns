@@ -1,4 +1,5 @@
 from django.urls import path
+from django.urls import include, path
 from . import views
 
 
@@ -6,7 +7,7 @@ from . import views
 urlpatterns = [
       path('', views.index, name='index'),
       path('dashboard/', views.dashboard, name="dashboard"),
-      path('forgot-password/', views.forgot_password, name="forgot_password"),
+      path('forgot_password/', views.forgot_password, name="forgot_password"),
       path('register/', views.register, name="register"),
       path('prouser/', views.prouser_create, name="prouser_create"),
       path('login/', views.login, name="login"),

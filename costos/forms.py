@@ -6,12 +6,17 @@ from .models import Provider
 from .models import Ingredient
 from .models import Receta
 from .models import Steps
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
 
 
 class ProUserForm(forms.ModelForm):
     class Meta:
         model = ProUser
         fields = [
+            'user',
+            'account_id',
             'phone',
             'address',
             'city',
@@ -113,3 +118,21 @@ class StepsForm(forms.ModelForm):
             'qty'
 
         ]
+
+class RegistrationForm(UserCreationForm):
+   email = forms.EmailField()
+   class Meta(UserCreationForm.Meta):
+       model = User
+       fields = UserCreationForm.Meta.fields + ('first_name','last_name','email')
+
+   #
+   # class Meta:
+	#     model = User
+	#     fields = [
+   #          'username',
+   #          'first_name',
+   #          'last_name',
+   #          'email',
+   #          'password1',
+   #          'password2'
+   #      ]
