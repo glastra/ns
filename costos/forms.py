@@ -120,10 +120,17 @@ class StepsForm(forms.ModelForm):
         ]
 
 class RegistrationForm(UserCreationForm):
-   email = forms.EmailField()
-   class Meta(UserCreationForm.Meta):
+   email = forms.EmailField(required=True)
+   class Meta():
        model = User
-       fields = UserCreationForm.Meta.fields + ('first_name','last_name','email')
+       fields = ('username','email','password1','password2','first_name','last_name')
+
+   def save(self, commit=True):
+       user = super(RegistrationForm, self).save(commit=False)
+       user.email = self.cleaned_data['email']
+       if commit:
+           user.save()
+       return user
 
    #
    # class Meta:

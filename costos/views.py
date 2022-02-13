@@ -1,4 +1,6 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth import login
+from django.contrib import messages
 from django.shortcuts import render, redirect, reverse
 from django.views.generic.list import ListView
 from .models import Ingredient
@@ -174,17 +176,20 @@ def login(request):
    return render(request, 'costos/login.html')
 
 
-def register(request):
+def register_request(request):
     if request.method == "POST":
         form = RegistrationForm(request.POST)
         print(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            login(user)
             print('saved')
-            return redirect("/index")
-    print('could not save')
+            messages.success(request, "Registration Successful")
+            return redirect("django_registration/registration_complete.html")
+        messages.error(request, "Registration Unsuccessful")
+        print('could not save')
     form = RegistrationForm()
-    return render(request, "costos/accounts/register.html", {"form":form})
+    return render(request=request, template_name="django_registration/registration_form.html", context={"RegistrationForm":form})
 
 
 def forgot_password(request):
