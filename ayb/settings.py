@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
 from pathlib import Path
+from django.db import models
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,21 +34,27 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'costos',
     'gettext',
     'crispy_forms',
     'formtools',
-    'django_registration'
+    'account',
+    'django_registration',
 ]
 ACCOUNT_ACTIVATION_DAYS = 7
+
+# AUTH_USER_MODEL = 'costos.ProUser'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -55,6 +62,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'account.middleware.LocaleMiddleware',
+    'account.middleware.TimezoneMiddleware',
+    'account.middleware.ExpiredPasswordMiddleware',
 ]
 
 ROOT_URLCONF = 'ayb.urls'
@@ -77,6 +87,10 @@ TEMPLATES = [
     },
 ]
 
+TEMPLATE_CONTEXT_PROCESSORS = [
+      "account.context_processors.account",
+    ]
+
 LOCALE_PATHS = [
     BASE_DIR / 'locale/',
 ]
@@ -84,7 +98,9 @@ LOCALE_PATHS = [
 
 WSGI_APPLICATION = 'ayb.wsgi.application'
 
-
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 

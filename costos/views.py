@@ -1,5 +1,7 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import logout
 from django.contrib import messages
 from django.shortcuts import render, redirect, reverse
 from django.views.generic.list import ListView
@@ -17,18 +19,21 @@ from .forms import RestaurantForm
 from .forms import IngredientForm
 from .forms import RecetaForm
 from .forms import Receta
-from .forms import RegistrationForm
+from .forms import NewUserForm
 from formtools.wizard.views import WizardView
-# Create your views here.
 
+
+# Create your views here.
 
 
 def index(request):
     return render(request, 'costos/index.html')
 
+
 class ProUserListView(PermissionRequiredMixin, ListView):
-   model = ProUser
-   permission_required = 'costos.add_prouser'
+    model = ProUser
+    permission_required = 'costos.add_prouser'
+
 
 def prouser_create(request):
     form = ProUserForm(request.POST or None)
@@ -38,11 +43,13 @@ def prouser_create(request):
         'form': form
     }
     return render(request, "costos/prouser_create.html",
-    context)
+                  context)
+
 
 class ProviderListView(PermissionRequiredMixin, ListView):
-   model = Provider
-   permission_required = 'costos.add_provider'
+    model = Provider
+    permission_required = 'costos.add_provider'
+
 
 def provider_create(request):
     form = ProviderForm(request.POST or None)
@@ -52,7 +59,8 @@ def provider_create(request):
         'form': form
     }
     return render(request, "costos/provider_create.html",
-    context)
+                  context)
+
 
 def restaurant_create(request):
     form = RestaurantForm(request.POST or None)
@@ -62,36 +70,38 @@ def restaurant_create(request):
         'form': form
     }
     return render(request, "costos/restaurant_create.html",
-    context)
+                  context)
+
 
 def ingredient_create(request):
     form = IngredientForm(request.POST or None)
     if form.is_valid():
         form.save()
     context = {
-         'form': form
-     }
+        'form': form
+    }
     return render(request, "costos/ingredient_create.html",
-    context)
+                  context)
+
 
 class IngredientListView(ListView):
     model = Ingredient
 
 
 def ingredient_detail(request, pk):
-     ingredient = Ingredient.objects.get(pk=pk)
+    ingredient = Ingredient.objects.get(pk=pk)
 
-     if request.method == 'POST':
-         Ingredient.save()
+    if request.method == 'POST':
+        Ingredient.save()
 
-         return redirect('ingredient_list')
+        return redirect('ingredient_list')
 
-     return render(request, 'costos/ingredient_detail.html', {'ingredient': ingredient})
+    return render(request, 'costos/ingredient_detail.html', {'ingredient': ingredient})
 
 
 class ProviderListView(PermissionRequiredMixin, ListView):
-   model = Provider
-   permission_required = 'costos.add_provider'
+    model = Provider
+    permission_required = 'costos.add_provider'
 
 
 def provider_detail(request, pk):
@@ -113,14 +123,16 @@ def provider_create(request):
         'form': form
     }
     return render(request, "costos/provider_create.html",
-    context)
+                  context)
 
 
 def restaurant(request):
-   return render(request, 'costos/restaurant.html')
+    return render(request, 'costos/restaurant.html')
+
 
 class RestaurantListView(ListView):
-   model = Restaurant
+    model = Restaurant
+
 
 def restaurant_detail(request, pk):
     restaurant = Restaurant.objects.get(pk=pk)
@@ -141,13 +153,15 @@ def restaurant_create(request):
         'form': form
     }
     return render(request, "costos/restaurant_create.html",
-    context)
+                  context)
+
 
 class RecetaListView(ListView):
-   model = Receta
+    model = Receta
+
 
 def receta(request):
-   return render(request, 'costos/receta.html')
+    return render(request, 'costos/receta.html')
 
 
 def receta_create(request):
@@ -158,7 +172,7 @@ def receta_create(request):
         'form': form
     }
     return render(request, "costos/receta_create.html",
-    context)
+                  context)
 
 
 def receta_detail(request, pk):
@@ -172,31 +186,52 @@ def receta_detail(request, pk):
     return render(request, 'costos/restaurant_detail.html', {'restaurant': restaurant})
 
 
-def login(request):
-   return render(request, 'costos/login.html')
+def login_request(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.info(request, f"You are now logged in as {username}.")
+                return redirect("index")
+            else:
+                messages.error(request, "Invalid username or password.")
+        else:
+            messages.error(request, "Invalid username or password.")
+    form = AuthenticationForm()
+    return render(request=request, template_name="costos/login.html", context={"login_form": form})
 
 
 def register_request(request):
     if request.method == "POST":
-        form = RegistrationForm(request.POST)
+        form = NewUserForm(request.POST)
         print(request.POST)
         if form.is_valid():
             user = form.save()
-            login(user)
+            login(request, user)
             print('saved')
             messages.success(request, "Registration Successful")
-            return redirect("django_registration/registration_complete.html")
+            return redirect("index")
         messages.error(request, "Registration Unsuccessful")
-        print('could not save')
-    form = RegistrationForm()
-    return render(request=request, template_name="django_registration/registration_form.html", context={"RegistrationForm":form})
+    print('could not save')
+    form = NewUserForm()
+    return render(request=request, template_name="costos/register.html",
+                  context={"register_form": form})
 
+
+def logout_view(request):
+    logout(request)
 
 def forgot_password(request):
-   return render(request, 'costos/forgot_password.html')
+    return render(request, 'costos/forgot_password.html')
+
 
 class CompanyListView(ListView):
     model = Company
+
 
 def company_create(request):
     form = CompanyForm(request.POST or None)
@@ -206,16 +241,18 @@ def company_create(request):
         'form': form
     }
     return render(request, "costos/company_create.html",
-    context)
+                  context)
+
 
 def company_detail(request, pk):
-     company = Company.objects.get(pk=pk)
+    company = Company.objects.get(pk=pk)
 
-     if request.method == 'POST':
-         Provider.save()
+    if request.method == 'POST':
+        Provider.save()
 
-         return redirect('provider_list')
-     return render(request, 'costos/company_detail.html', {'company': company})
+        return redirect('provider_list')
+    return render(request, 'costos/company_detail.html', {'company': company})
+
 
 def dashboard(request):
-     return render(request, 'costos/dashboard.html')
+    return render(request, 'costos/dashboard.html')

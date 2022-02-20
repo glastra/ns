@@ -84,22 +84,24 @@ class IngredientForm(forms.ModelForm):
     class Meta:
         model = Ingredient
         fields = [
+            'chef',
+            'provider',
             'name',
             'description',
             'presentation',
             'type',
             'price',
             'qty',
-            'merma'
+            'merma',
 
         ]
+
 
 class RecetaForm(forms.ModelForm):
 
     class Meta:
         model = Receta
         fields = [
-            'chef',
             'restaurant',
             'name',
             'description',
@@ -119,14 +121,15 @@ class StepsForm(forms.ModelForm):
 
         ]
 
-class RegistrationForm(UserCreationForm):
+class NewUserForm(UserCreationForm):
    email = forms.EmailField(required=True)
+
    class Meta():
        model = User
        fields = ('username','email','password1','password2','first_name','last_name')
 
    def save(self, commit=True):
-       user = super(RegistrationForm, self).save(commit=False)
+       user = super(NewUserForm, self).save(commit=False)
        user.email = self.cleaned_data['email']
        if commit:
            user.save()
