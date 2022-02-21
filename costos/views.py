@@ -1,37 +1,23 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import logout
 from django.contrib import messages
 from django.shortcuts import render, redirect, reverse
 from django.views.generic.list import ListView
-from .models import Ingredient
-from .models import Company
-from .models import Restaurant
-from .models import Provider
-from .models import ProUser
-from .models import Receta
 from django.shortcuts import render
-from .forms import ProviderForm
-from .forms import ProUserForm
-from .forms import CompanyForm
-from .forms import RestaurantForm
-from .forms import IngredientForm
-from .forms import RecetaForm
-from .forms import Receta
-from .forms import NewUserForm
+
+from .models import Ingredient, Company, Receta, Restaurant, Provider
+from .forms import ProviderForm, UserForm, CompanyForm, RestaurantForm, IngredientForm, RecetaForm, Receta, NewUserForm
 from formtools.wizard.views import WizardView
 
-
 # Create your views here.
-
-
 def index(request):
+    print(request.user)
     return render(request, 'costos/index.html')
 
 
-class ProUserListView(PermissionRequiredMixin, ListView):
-    model = ProUser
+class UserListView(PermissionRequiredMixin, ListView):
+    model = get_user_model()
     permission_required = 'costos.add_prouser'
 
 
@@ -52,9 +38,13 @@ class ProviderListView(PermissionRequiredMixin, ListView):
 
 
 def provider_create(request):
-    form = ProviderForm(request.POST or None)
-    if form.is_valid():
-        form.save()
+    if request.method == 'POST':
+        form = ProviderForm(request.POST)
+        if form.is_valid():
+            form.save()
+            redirect('provider_list')
+    else:
+        form = ProviderForm()
     context = {
         'form': form
     }
@@ -63,23 +53,34 @@ def provider_create(request):
 
 
 def restaurant_create(request):
-    form = RestaurantForm(request.POST or None)
-    if form.is_valid():
-        form.save()
+    print(request.user.get_full_name())
+    if request.method == 'POST':
+        form = RestaurantForm(request.POST)
+        if form.is_valid():
+            restaurant = form.save(commit=False)
+            restaurant.manager = request.user
+            restaurant.save()
+            redirect('restaurant_list')
+    else:
+        form = RestaurantForm()
     context = {
         'form': form
     }
-    return render(request, "costos/restaurant_create.html",
-                  context)
+    return render(request, "costos/restaurant_create.html", context)
 
 
 def ingredient_create(request):
-    form = IngredientForm(request.POST or None)
+    form = IngredientForm(request.POST)
     if form.is_valid():
-        form.save()
+        ingredient = form.save(commit=False)
+        ingredient.chef = request.user
+        ingredient.save()
+        print('is good')
+        return redirect('IngredientListView')
     context = {
         'form': form
     }
+    print(request.POST)
     return render(request, "costos/ingredient_create.html",
                   context)
 
@@ -144,16 +145,6 @@ def restaurant_detail(request, pk):
 
     return render(request, 'costos/restaurant_detail.html', {'restaurant': restaurant})
 
-
-def restaurant_create(request):
-    form = RestaurantForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-    context = {
-        'form': form
-    }
-    return render(request, "costos/restaurant_create.html",
-                  context)
 
 
 class RecetaListView(ListView):

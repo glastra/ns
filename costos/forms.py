@@ -1,21 +1,21 @@
 from django import forms
-from .models import ProUser
 from .models import Company
 from .models import Restaurant
 from .models import Provider
 from .models import Ingredient
 from .models import Receta
 from .models import Steps
+from django.forms import ModelForm, HiddenInput
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, Hidden
 
 
-
-class ProUserForm(forms.ModelForm):
+class UserForm(forms.ModelForm):
     class Meta:
-        model = ProUser
+        model = get_user_model()
         fields = [
-            'user',
             'account_id',
             'phone',
             'address',
@@ -27,9 +27,12 @@ class ProUserForm(forms.ModelForm):
         ]
 
 class CompanyForm(forms.ModelForm):
+
+
     class Meta:
         model = Company
         fields = [
+            'owner',
             'name',
             'description',
             'address',
@@ -44,9 +47,11 @@ class CompanyForm(forms.ModelForm):
 
 
 class ProviderForm(forms.ModelForm):
+
     class Meta:
         model = Provider
         fields = [
+            'company',
             'name',
             'description',
             'address',
@@ -62,6 +67,7 @@ class ProviderForm(forms.ModelForm):
 
 
 class RestaurantForm(forms.ModelForm):
+
     class Meta:
         model = Restaurant
         fields = [
@@ -81,6 +87,7 @@ class RestaurantForm(forms.ModelForm):
 
 
 class IngredientForm(forms.ModelForm):
+
     class Meta:
         model = Ingredient
         fields = [
@@ -102,6 +109,7 @@ class RecetaForm(forms.ModelForm):
     class Meta:
         model = Receta
         fields = [
+            'chef',
             'restaurant',
             'name',
             'description',
@@ -112,9 +120,12 @@ class RecetaForm(forms.ModelForm):
 
 
 class StepsForm(forms.ModelForm):
+
     class Meta:
         model = Steps
         fields = [
+            'receta',
+            'ingredient',
             'preparacion',
             'merma',
             'qty'
@@ -125,7 +136,7 @@ class NewUserForm(UserCreationForm):
    email = forms.EmailField(required=True)
 
    class Meta():
-       model = User
+       model = get_user_model()
        fields = ('username','email','password1','password2','first_name','last_name')
 
    def save(self, commit=True):
@@ -135,14 +146,3 @@ class NewUserForm(UserCreationForm):
            user.save()
        return user
 
-   #
-   # class Meta:
-	#     model = User
-	#     fields = [
-   #          'username',
-   #          'first_name',
-   #          'last_name',
-   #          'email',
-   #          'password1',
-   #          'password2'
-   #      ]

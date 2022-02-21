@@ -25,15 +25,15 @@ urlpatterns = [
       path('provider/', views.ProviderListView.as_view(), name="ProviderListView"),
       path('provider/<int:pk>/', views.provider_detail, name="provider_detail"),
       path('provider/add/', views.provider_create, name="provider_create"),
-      path('restaurant/', views.RestaurantListView.as_view() , name="restaurant"),
-      path('restaurant/<int:pk>/', views.restaurant_detail, name="restaurant_detail"),
-      path('restaurant/add/', views.restaurant_create, name="restaurant_create"),
+      path('restaurants/', views.RestaurantListView.as_view() , name="restaurant_list"),
+      path('restaurants/<int:pk>/', views.restaurant_detail, name="restaurant_detail"),
+      path('restaurants/add/', views.restaurant_create, name="restaurant_create"),
       path('receta/', views.RecetaListView.as_view() , name="receta"),
       path('receta/<int:pk>/', views.receta_detail, name="receta_detail"),
       path('receta/add/', views.receta_create, name="receta_create"),
-      path('ingredient/', views.IngredientListView.as_view(), name="IngredientListView"),
-      path('ingredient/<int:pk>/', views.ingredient_detail, name="ingredient_detail"),
-      path('ingredient/add/', views.ingredient_create, name="ingredient_create"),
+      path('ingredients/', views.IngredientListView.as_view(), name="IngredientListView"),
+      path('ingredients/<int:pk>/', views.ingredient_detail, name="ingredient_detail"),
+      path('ingredients/add/', views.ingredient_create, name="ingredient_create"),
 
 ]
 

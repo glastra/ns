@@ -5,27 +5,26 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 # create a pro user model
-class ProUser(models.Model):
+class User(AbstractUser):
     # declare pro user attributes
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
     account_id = models.CharField(max_length=10)
     phone = models.CharField(max_length=12)
     country = models.CharField(max_length=12)
     address = models.CharField(_('address'), max_length=100, blank=True)
     city = models.CharField(_('city'), max_length=100, blank=True)
     state = models.CharField(_('state'), max_length=100, blank=True)
-    zipCode = models.CharField(_('zipCode'), max_length=100, blank=True)
+    zip_code = models.CharField(_('zip code'), max_length=100, blank=True)
     contacto = models.CharField(_('contacto'), max_length=100, blank=True)
     notes = models.CharField(_('notes'), max_length=250, blank=True)
     verified = models.BooleanField(default=False, verbose_name=_('Verified'))
     is_pro = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.user.get_full_name()
+        return self.get_full_name()
 
 
 class Company(models.Model):
-    id = models.AutoField(primary_key=True)
+
     name = models.CharField(_('name'), max_length=250)
     description = models.CharField(_('description'), max_length=250, blank=True)
     address = models.CharField(_('address'), max_length=100, blank=True)
@@ -55,7 +54,7 @@ class Company(models.Model):
 
 
 class Provider(models.Model):
-    id = models.AutoField(primary_key=True)
+
     name = models.CharField(_('name'), max_length=250)
     description = models.CharField(_('description'), max_length=250, blank=True)
     address = models.CharField(_('address'), max_length=100, blank=True)
@@ -79,7 +78,7 @@ class Provider(models.Model):
             })
 
 class Restaurant(models.Model):
-    id = models.AutoField(primary_key=True)
+
     name = models.CharField(_('name'), max_length=250)
     description = models.CharField(_('description'), max_length=250, blank=True)
     address = models.CharField(_('address'), max_length=250, blank=True)
@@ -93,7 +92,7 @@ class Restaurant(models.Model):
     url_corp = models.CharField(_('url'), max_length=250, blank=True)
     feeds = models.CharField(_('feeds'), max_length=250, blank=True)
     chefs = models.ManyToManyField(get_user_model(), related_name='restaurant_chef')
-    manager = models.ForeignKey(get_user_model(), related_name='restaurant_manager', on_delete=models.CASCADE)
+    manager = models.ForeignKey(get_user_model(), related_name='restaurant_manager', on_delete=models.CASCADE, null=True)
     providers = models.ManyToManyField(Provider)
 
     def __str__(self):
@@ -103,11 +102,6 @@ class Restaurant(models.Model):
         return reverse('Restaurant:detail', kwargs={
                'id': self.id
             })
-
-    def save_model(self, request, obj, form, change):
-        obj.manager = request.user
-        super().save_model(request, obj, form, change)
-
 
 class Ingredient(models.Model):
 
@@ -132,7 +126,6 @@ class Ingredient(models.Model):
         (FRUVER, "FruVer")
     ]
 
-    id = models.AutoField(primary_key=True)
     name = models.CharField(_('name'), max_length=250)
     type = models.CharField(_('type'), max_length=50, choices=CATEGORY_CHOICES, default=GROCERY)
     presentation = models.CharField(_('presentation'), max_length=50, choices=PRESENTATION_CHOICES, default=GRAM)
@@ -140,9 +133,10 @@ class Ingredient(models.Model):
     description = models.TextField(_('description'), max_length=999)
     price = models.DecimalField(max_digits=20, decimal_places=10)
     qty = models.DecimalField(max_digits=20, decimal_places=10)
-    chef = models.ForeignKey(get_user_model(), related_name='ingredient_chef', on_delete=models.CASCADE)
     merma = models.DecimalField(max_digits=10, decimal_places=6, default=0.01)
+
     provider = models.ForeignKey(Provider, related_name='ingredient_provider', on_delete=models.CASCADE)
+    chef = models.ForeignKey(get_user_model(), related_name='ingredient_chef', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -152,14 +146,10 @@ class Ingredient(models.Model):
             'id': self.id
         })
 
-    def save_model(self, request, obj, form, change):
-        obj.chef = request.user
-        super().save_model(request, obj, form, change)
-
 
 
 class Receta(models.Model):
-    id = models.AutoField(primary_key=True)
+
     name = models.CharField(_('name'), max_length=100)
     description = models.CharField(_('description'), max_length=250, blank=True)
     isComplete = models.BooleanField(default=False)
@@ -195,7 +185,7 @@ class Receta(models.Model):
 
 
 class Steps(models.Model):
-    id = models.AutoField(primary_key=True)
+
     receta = models.ForeignKey(Receta,related_name='steps_receta',on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient,related_name='steps_ingredient',on_delete=models.CASCADE)
     qty = models.DecimalField(max_digits=20,decimal_places=10)
@@ -210,6 +200,3 @@ class Steps(models.Model):
             'id': self.id
        })
 
-  # def save_model(self, request, obj, form, change):
-  #       obj.chef_id = request.user
-  #       super().save_model(request, obj, form, change)

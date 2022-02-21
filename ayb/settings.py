@@ -49,7 +49,7 @@ INSTALLED_APPS = [
 ]
 ACCOUNT_ACTIVATION_DAYS = 7
 
-# AUTH_USER_MODEL = 'costos.ProUser'
+AUTH_USER_MODEL = 'costos.User'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
