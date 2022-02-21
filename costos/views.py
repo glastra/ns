@@ -12,23 +12,22 @@ from formtools.wizard.views import WizardView
 
 # Create your views here.
 def index(request):
-    print(request.user)
     return render(request, 'costos/index.html')
 
 
 class UserListView(PermissionRequiredMixin, ListView):
     model = get_user_model()
-    permission_required = 'costos.add_prouser'
+    permission_required = 'costos.add_user'
 
 
-def prouser_create(request):
-    form = ProUserForm(request.POST or None)
+def user_create(request):
+    form = UserForm(request.POST or None)
     if form.is_valid():
         form.save()
     context = {
         'form': form
     }
-    return render(request, "costos/prouser_create.html",
+    return render(request, "costos/user_create.html",
                   context)
 
 
@@ -53,14 +52,14 @@ def provider_create(request):
 
 
 def restaurant_create(request):
-    print(request.user.get_full_name())
+
     if request.method == 'POST':
         form = RestaurantForm(request.POST)
         if form.is_valid():
             restaurant = form.save(commit=False)
             restaurant.manager = request.user
             restaurant.save()
-            redirect('restaurant_list')
+            return redirect('restaurant_list')
     else:
         form = RestaurantForm()
     context = {
@@ -70,19 +69,20 @@ def restaurant_create(request):
 
 
 def ingredient_create(request):
-    form = IngredientForm(request.POST)
-    if form.is_valid():
-        ingredient = form.save(commit=False)
-        ingredient.chef = request.user
-        ingredient.save()
-        print('is good')
-        return redirect('IngredientListView')
+
+    if request.method == 'POST':
+        form = IngredientForm(request.POST)
+        if form.is_valid():
+            ingredient = form.save(commit=False)
+            ingredient.chef = request.user
+            ingredient.save()
+            return redirect('ingredient_list')
+    else:
+        form = IngredientForm()
     context = {
         'form': form
     }
-    print(request.POST)
-    return render(request, "costos/ingredient_create.html",
-                  context)
+    return render(request, "costos/ingredient_create.html",context)
 
 
 class IngredientListView(ListView):

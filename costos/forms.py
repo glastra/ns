@@ -91,7 +91,7 @@ class IngredientForm(forms.ModelForm):
     class Meta:
         model = Ingredient
         fields = [
-            'chef',
+
             'provider',
             'name',
             'description',
@@ -109,7 +109,7 @@ class RecetaForm(forms.ModelForm):
     class Meta:
         model = Receta
         fields = [
-            'chef',
+
             'restaurant',
             'name',
             'description',

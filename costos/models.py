@@ -48,11 +48,6 @@ class Company(models.Model):
             'id': self.id
         })
 
-    def save_model(self, request, obj, form, change):
-        obj.owner = request.user
-        super().save_model(request, obj, form, change)
-
-
 class Provider(models.Model):
 
     name = models.CharField(_('name'), max_length=250)
@@ -178,11 +173,6 @@ class Receta(models.Model):
         return reverse('Receta:detail', kwargs={
             'id': self.id
         })
-
-    def save_model(self, request, obj, form, change):
-        obj.chef = request.user
-        super().save_model(request, obj, form, change)
-
 
 class Steps(models.Model):
 
