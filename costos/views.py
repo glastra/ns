@@ -7,7 +7,7 @@ from django.views.generic.list import ListView
 from django.shortcuts import render
 
 from .models import Ingredient, Company, Receta, Restaurant, Provider
-from .forms import ProviderForm, UserForm, CompanyForm, RestaurantForm, IngredientForm, RecetaForm, Receta, NewUserForm
+from .forms import ProviderForm, UserForm, CompanyForm, RestaurantForm, IngredientForm, RecetaForm, Receta, NewUserForm, StepsForm
 from formtools.wizard.views import WizardView
 
 # Create your views here.
@@ -175,6 +175,22 @@ def receta_detail(request, pk):
         return redirect('recetalist')
 
     return render(request, 'costos/restaurant_detail.html', {'restaurant': restaurant})
+
+
+def steps_create(request):
+
+    if request.method == 'POST':
+        form = StepsForm(request.POST)
+        if form.is_valid():
+            steps = form.save(commit=False)
+            steps.save()
+            return redirect('receta_create')
+    else:
+        form = StepsForm()
+    context = {
+        'form': form
+    }
+    return render(request, "costos/steps_create.html",context)
 
 
 def login_request(request):

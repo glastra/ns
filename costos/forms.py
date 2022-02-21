@@ -118,7 +118,6 @@ class RecetaForm(forms.ModelForm):
         ]
 
 
-
 class StepsForm(forms.ModelForm):
 
     class Meta:

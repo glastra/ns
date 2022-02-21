@@ -176,11 +176,12 @@ class Receta(models.Model):
 
 class Steps(models.Model):
 
+    qty = models.DecimalField(_('qty'), max_digits=20,decimal_places=10)
+    preparacion = models.CharField(_('preparation'), max_length=250)
+    merma = models.DecimalField(_('merma'), max_digits=10,decimal_places=6)
+
     receta = models.ForeignKey(Receta,related_name='steps_receta',on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient,related_name='steps_ingredient',on_delete=models.CASCADE)
-    qty = models.DecimalField(max_digits=20,decimal_places=10)
-    preparacion = models.CharField(max_length=250)
-    merma = models.DecimalField(max_digits=10,decimal_places=6)
 
     def __str__(self):
         return self.preparacion

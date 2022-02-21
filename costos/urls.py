@@ -34,6 +34,7 @@ urlpatterns = [
       path('ingredients/', views.IngredientListView.as_view(), name="ingredient_list"),
       path('ingredients/<int:pk>/', views.ingredient_detail, name="ingredient_detail"),
       path('ingredients/add/', views.ingredient_create, name="ingredient_create"),
+      path('steps/add/', views.steps_create, name="steps_create"),
 
 ]
 
