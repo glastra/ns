@@ -89,6 +89,7 @@ TEMPLATES = [
 
 TEMPLATE_CONTEXT_PROCESSORS = [
       "account.context_processors.account",
+      "django.core.context_processors.request",
     ]
 
 LOCALE_PATHS = [
@@ -162,3 +163,4 @@ STATIC_ROOT = os.path.join(VENV_PATH, 'static_root')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'home'
+SITE_ID=1

@@ -4,6 +4,21 @@
 {% block meta_desc %} A&B Cost {% endblock %}
 {% block title %} A&B Cost {% endblock %}
 {%block content %}
+    <h1>{% trans "HELLO GASTRO WORLD" %}</h1>
+    {% get_current_language as LANGUAGE_CODE %}
+    <h2>{{LANGUAGE_CODE}}</h2>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ redirect_to}}">
+        <select name="language" id="">
+            {% get_available_languages as LANGUAGES %}
+            {% get_language_info_list for LANGUAGES as languages %}
+            {% for language in languages %}
+             <option value="{{ language.code }}" {% if language.code == LANGUAGES_CODE %} selected {% endif %} >
+                 {{ language.name_local }} ({{ language.code }})
+             </option>
+            {% endfor %}
+        </select>
 
-
+    </form>
 {% endblock %}}

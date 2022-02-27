@@ -18,7 +18,8 @@ class UserForm(forms.ModelForm):
         fields = [
             'account_id',
             'phone',
-            'address',
+            'extra_street',
+            'street',
             'city',
             'state',
             'country',
@@ -35,7 +36,8 @@ class CompanyForm(forms.ModelForm):
             'owner',
             'name',
             'description',
-            'address',
+            'extra_street',
+            'street',
             'city',
             'state',
             'contacto',
@@ -54,10 +56,31 @@ class ProviderForm(forms.ModelForm):
             'company',
             'name',
             'description',
-            'address',
+            'extra_street',
+            'street',
             'city',
             'state',
-            'zipcode',
+            'zip_code',
+            'contacto',
+            'notes',
+            'email',
+            'url_corp',
+            'feeds'
+        ]
+
+
+class ProviderCreateForm(forms.ModelForm):
+
+    class Meta:
+        model = Provider
+        fields = [
+            'name',
+            'description',
+            'extra_street',
+            'street',
+            'city',
+            'state',
+            'zip_code',
             'contacto',
             'notes',
             'email',
@@ -73,7 +96,8 @@ class RestaurantForm(forms.ModelForm):
         fields = [
             'name',
             'description',
-            'address',
+            'extra_street',
+            'street',
             'city',
             'state',
             'contacto',
@@ -123,25 +147,24 @@ class StepsForm(forms.ModelForm):
     class Meta:
         model = Steps
         fields = [
-            'receta',
-            'ingredient',
-            'preparacion',
+            'qty',
             'merma',
-            'qty'
-
+            'preparacion',
+            'duration',
         ]
 
+
 class NewUserForm(UserCreationForm):
-   email = forms.EmailField(required=True)
+    email = forms.EmailField(required=True)
 
-   class Meta():
-       model = get_user_model()
-       fields = ('username','email','password1','password2','first_name','last_name')
+    class Meta:
+        model = get_user_model()
+        fields = ('username','email','password1','password2','first_name','last_name')
 
-   def save(self, commit=True):
-       user = super(NewUserForm, self).save(commit=False)
-       user.email = self.cleaned_data['email']
-       if commit:
-           user.save()
-       return user
+    def save(self, commit=True):
+        user = super(NewUserForm, self).save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+        return user
 
