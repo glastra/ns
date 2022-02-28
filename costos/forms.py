@@ -1,10 +1,5 @@
 from django import forms
-from .models import Company
-from .models import Restaurant
-from .models import Provider
-from .models import Ingredient
-from .models import Receta
-from .models import Steps
+from .models import  Restaurant, Provider, Ingredient, Receta, Steps
 from django.forms import ModelForm, HiddenInput
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
@@ -18,33 +13,7 @@ class UserForm(forms.ModelForm):
         fields = [
             'account_id',
             'phone',
-            'extra_street',
-            'street',
-            'city',
-            'state',
-            'country',
-            'contacto',
 
-        ]
-
-class CompanyForm(forms.ModelForm):
-
-
-    class Meta:
-        model = Company
-        fields = [
-            'owner',
-            'name',
-            'description',
-            'extra_street',
-            'street',
-            'city',
-            'state',
-            'contacto',
-            'notes',
-            'email',
-            'url_corp',
-            'feeds'
         ]
 
 
@@ -53,7 +22,6 @@ class ProviderForm(forms.ModelForm):
     class Meta:
         model = Provider
         fields = [
-            'company',
             'name',
             'description',
             'extra_street',
@@ -61,31 +29,9 @@ class ProviderForm(forms.ModelForm):
             'city',
             'state',
             'zip_code',
-            'contacto',
-            'notes',
+            'contact',
             'email',
-            'url_corp',
-            'feeds'
-        ]
-
-
-class ProviderCreateForm(forms.ModelForm):
-
-    class Meta:
-        model = Provider
-        fields = [
-            'name',
-            'description',
-            'extra_street',
-            'street',
-            'city',
-            'state',
-            'zip_code',
-            'contacto',
-            'notes',
-            'email',
-            'url_corp',
-            'feeds'
+            'web',
         ]
 
 
@@ -100,12 +46,6 @@ class RestaurantForm(forms.ModelForm):
             'street',
             'city',
             'state',
-            'contacto',
-            'notes',
-            'email',
-            'url_corp',
-            'feeds',
-            'providers',
             'chefs'
         ]
 
@@ -123,7 +63,7 @@ class IngredientForm(forms.ModelForm):
             'type',
             'price',
             'qty',
-            'merma',
+            'error',
 
         ]
 
@@ -148,8 +88,8 @@ class StepsForm(forms.ModelForm):
         model = Steps
         fields = [
             'qty',
-            'merma',
-            'preparacion',
+            'error',
+            'preparation',
             'duration',
         ]
 

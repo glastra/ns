@@ -7,8 +7,8 @@ from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.views.generic.list import ListView
 from django.shortcuts import render
-from .models import Ingredient, Company, Receta, Restaurant, Provider
-from .forms import ProviderForm, UserForm, CompanyForm, RestaurantForm, IngredientForm, RecetaForm, Receta, NewUserForm, StepsForm
+from .models import Ingredient,  Receta, Restaurant, Provider
+from .forms import ProviderForm, UserForm,  RestaurantForm, IngredientForm, RecetaForm, NewUserForm, StepsForm
 
 from formtools.wizard.views import WizardView
 
@@ -165,6 +165,7 @@ class RecetaCreateForm(ModelForm):
         super(RecetaCreateForm, self).__init__(*args, **kwargs)
 
     def save(self, commit=True, **kwargs):
+
         r_create_form = super(Receta, self).save(commit=False)
         r_create_form.restaurant = 'NS restaurante'
         if commit:
@@ -272,30 +273,30 @@ def logout_view(request):
 def forgot_password(request):
     return render(request, 'costos/forgot_password.html')
 
-
-class CompanyListView(ListView):
-    model = Company
-
-
-def company_create(request):
-    form = CompanyForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-    context = {
-        'form': form
-    }
-    return render(request, "costos/company_create.html",
-                  context)
-
-
-def company_detail(request, pk):
-    company = Company.objects.get(pk=pk)
-
-    if request.method == 'POST':
-        Provider.save()
-
-        return redirect('provider_list')
-    return render(request, 'costos/company_detail.html', {'company': company})
+#
+# class CompanyListView(ListView):
+#     model = Company
+#
+#
+# def company_create(request):
+#     form = CompanyForm(request.POST or None)
+#     if form.is_valid():
+#         form.save()
+#     context = {
+#         'form': form
+#     }
+#     return render(request, "costos/company_create.html",
+#                   context)
+#
+#
+# def company_detail(request, pk):
+#     company = Company.objects.get(pk=pk)
+#
+#     if request.method == 'POST':
+#         Provider.save()
+#
+#         return redirect('provider_list')
+#     return render(request, 'costos/company_detail.html', {'company': company})
 
 
 def dashboard(request):
