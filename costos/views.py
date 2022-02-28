@@ -173,6 +173,8 @@ class RecetaCreateForm(ModelForm):
         return r_create_form
 
 
+
+
 class RecetaAddView(LoginRequiredMixin, View):
 
     model = Receta
@@ -221,14 +223,18 @@ def steps_create(request):
         form = StepsForm(request.POST)
         if form.is_valid():
             steps = form.save(commit=False)
+            ing = steps.ingredient
+            steps.cost_gmu = ing.price * ing.qty
+            steps.cost_waste = (steps.cost_gmu * steps.error)/100
+            steps.cost_total = (steps.cost_gmu * steps.qty) + steps.cost_waste
             steps.save()
-            return redirect('receta_create')
+            return redirect('index')
     else:
         form = StepsForm()
     context = {
         'form': form
     }
-    return render(request, "costos/steps_create.html",context)
+    return render(request, "costos/steps_create.html", context)
 
 
 def login_request(request):

@@ -161,6 +161,7 @@ class Receta(models.Model):
             'id': self.id
         })
 
+
 class Steps(models.Model):
 
     qty = models.DecimalField(_('Qty'), max_digits=20,decimal_places=10, default=1.0)
@@ -171,6 +172,7 @@ class Steps(models.Model):
     ingredient = models.ForeignKey(Ingredient, related_name='steps_ingredient', on_delete=models.CASCADE)
     cost_gmu = models.DecimalField(_('Cost_gmu'), max_digits=20, decimal_places=10, default=0.0)
     cost_total = models.DecimalField(_('Cost_total'), max_digits=20, decimal_places=10, default=0.0)
+    cost_waste = models.DecimalField(_('Cost_waste'), max_digits=20, decimal_places=10, default=0.0)
     error = models.DecimalField(_('Error'), max_digits=20, decimal_places=10, default=0.01)
 
     def __str__(self):

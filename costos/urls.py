@@ -34,7 +34,7 @@ urlpatterns = [
       path('ingredientes/', views.IngredientListView.as_view(), name="ingredient_list"),
       path('ingrediente/<int:pk>/', views.ingredient_detail, name="ingredient_detail"),
       path('ingrediente/nuevo/', views.ingredient_create, name="ingredient_create"),
-      path('pasos/nuevo/', views.steps_create, name="steps_create"),
+      path('paso/nuevo/', views.steps_create, name="steps_create"),
 
 ]
 

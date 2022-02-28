@@ -87,6 +87,8 @@ class StepsForm(forms.ModelForm):
     class Meta:
         model = Steps
         fields = [
+            'receta',
+            'ingredient',
             'qty',
             'error',
             'preparation',
