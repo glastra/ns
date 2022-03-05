@@ -1,11 +1,9 @@
 from django.urls import path
-from django.urls import include, path
 from . import views
 
-
-
 urlpatterns = [
-      path('', views.index, name='index'),
+      # path('', views.index, name='index'),
+      path('', views.HomeView.as_view(), name='home'),
       path('login/', views.login_request, name="login"),
       # path('accounts/logout/', name="logout"),
       # path('accounts/password_change/', name="password_change"),
@@ -22,19 +20,24 @@ urlpatterns = [
       # path('companias/', views.CompanyListView.as_view(), name="CompanyListView"),
       # path('companias/<int:pk>/', views.company_detail, name="company_detail"),
       # path('companias/add/', views.company_create, name="company_create"),
-      path('proveedor/', views.ProviderListView.as_view(), name="ProviderListView"),
-      path('proveedor/<int:pk>/', views.provider_detail, name="provider_detail"),
-      path('proveedor/nuevo/', views.provider_create, name="provider_create"),
-      path('restaurantes/', views.RestaurantListView.as_view() , name="restaurant_list"),
-      path('restaurantes/<int:pk>/', views.restaurant_detail, name="restaurant_detail"),
-      path('restaurantes/nuevo/', views.restaurant_create, name="restaurant_create"),
-      path('recetas/', views.RecetaListView.as_view() , name="receta"),
-      path('receta/<int:pk>/', views.receta_detail, name="receta_detail"),
-      path('receta/add/', views.RecetaAddView.as_view(), name="AddRecetaView"),
-      path('ingredientes/', views.IngredientListView.as_view(), name="ingredient_list"),
-      path('ingrediente/<int:pk>/', views.ingredient_detail, name="ingredient_detail"),
-      path('ingrediente/nuevo/', views.ingredient_create, name="ingredient_create"),
-      path('paso/nuevo/', views.steps_create, name="steps_create"),
+      path('providers/', views.ProviderListView.as_view(), name="ProviderListView"),
+      path('provider/<int:pk>/', views.provider_detail, name="provider_detail"),
+      path('provider/add/', views.provider_create, name="provider_create"),
+      path('restaurants/', views.RestaurantListView.as_view() , name="restaurant_list"),
+      path('restaurant/<int:pk>/', views.restaurant_detail, name="restaurant_detail"),
+      path('restaurant/add/', views.restaurant_create, name="restaurant_create"),
+      path('recetas/', views.RecetaListView.as_view() , name="RecetaViewList"),
+      path('receta/<int:pk>/', views.RecetaDetailView.as_view(), name="receta_detail"),
+      path('receta/<int:pk>/steps/edit/', views.RecetaStepsEditView.as_view(), name="receta_steps_edit"),
+      path('receta/add/', views.RecetaCreateView.as_view(), name="add_receta"),
+      path('steps/add/', views.steps_create, name="steps_create"),
+      path('steps/', views.StepListView.as_view(), name="steps_list"),
+      path('steps/<int:pk>/', views.steps_detail, name="steps_detail"),
+      path('ingredients/', views.IngredientListView.as_view(), name="IngredientViewList"),
+      path('ingredient/<int:pk>/', views.ingredient_detail, name="ingredient_detail"),
+     # path('ingredient/<int:pk>/steps/edit/', views.IngredientStepsEditView.as_view(), name="ingredient_steps_edit"),
+      path('ingredient/add/', views.ingredient_create, name="ingredient_create"),
+
 
 ]
 

@@ -3,6 +3,7 @@ from .models import  Restaurant, Provider, Ingredient, Receta, Steps
 from django.forms import ModelForm, HiddenInput
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
+from django.forms.models import inlineformset_factory
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, Hidden
 
@@ -80,6 +81,35 @@ class RecetaForm(forms.ModelForm):
             'portions',
             'items',
         ]
+
+
+class RecetaCreateForm(ModelForm):
+
+    class Meta:
+        model = Receta
+        exclude = ['restaurant', 'items']
+        fields = [
+            'name',
+            'description',
+            'portions',
+            'errormargin',
+        ]
+
+    def __init__(self, request, *args, ** kwargs):
+        super(RecetaCreateForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id-recetaCreateForm'
+        self.helper.form_tag = False
+
+    def save(self, commit=True, **kwargs):
+        r_create_form = super(Receta, self).save(commit=False)
+        r_create_form.restaurant = 'NS restaurante'
+        if commit:
+            r_create_form.save()
+        return r_create_form
+
+
+RecetaStepsFormset = inlineformset_factory(Receta, Steps, fields=('preparation', 'qty',))
 
 
 class StepsForm(forms.ModelForm):

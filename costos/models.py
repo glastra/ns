@@ -124,8 +124,8 @@ class Ingredient(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('Ingredient:detail', kwargs={
-            'id': self.id
+        return reverse('ingredient_detail', kwargs={
+            'pk': self.pk
         })
 
 
@@ -134,7 +134,7 @@ class Receta(models.Model):
     name = models.CharField(_('Name'), max_length=100)
     description = models.CharField(_('Description'), max_length=250, blank=True)
     is_complete = models.BooleanField(_('Is complete'),default=False)
-    cost = models.DecimalField(_('Cost'),max_digits=20, decimal_places=10)
+    cost = models.DecimalField(_('Cost'),max_digits=20, decimal_places=10, default=0.0)
     portions = models.DecimalField(_('Portions'),max_digits=20, decimal_places=10, default=1.0)
     mpcost = models.DecimalField(_('Mp_cost'),max_digits=20, decimal_places=10, default=0.0)
     prepacost = models.DecimalField(_('Prep_cost'),max_digits=20, decimal_places=10, default=0.0)
@@ -157,8 +157,8 @@ class Receta(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('Receta:detail', kwargs={
-            'id': self.id
+        return reverse('receta_detail', kwargs={
+            'pk': self.pk
         })
 
 

@@ -11,7 +11,7 @@
      <div class="col-xl-10 col-lg-12 col-md-9">
        <div class="card o-hidden border-0 shadow-lg my-5">
          <div class="card-body p-3">
-                         <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item waves-effect waves-light">
                     <a class="nav-link" id="ingredient-tab" data-toggle="tab" href="{% url 'ingredient_create' %}" role="tab" aria-controls="ingredient" aria-selected="false">Ingrediente</a>
                 </li>
@@ -29,7 +29,7 @@
                          <div class="col">
                              <form method="post" >
                                 {% csrf_token %}
-                                {{ form.name | as_crispy_field }}
+                                {{ form | crispy }}
                                 <button class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" type="submit">
                                     <span aria-hidden="true">Submit</span>
                                 </button>

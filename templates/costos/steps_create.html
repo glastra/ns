@@ -5,7 +5,7 @@
 {% block meta_desc %} A&B Cost {% endblock %}
 {% block title %} A&B Cost - Paso Nuevo {% endblock %}
 {%block content %}
-<div class="text-center"><h1 class="h3 mb-0 text-gray-800">Nuevo Pasos</h1>
+<div class="text-center"><h1 class="h3 mb-0 text-gray-800">Nuevo Paso</h1>
  </div>
  <body class="bg-gradient-primary">
   <div class="container">
@@ -16,7 +16,7 @@
            <div class="form-group">
              <form method="post" >
                 {% csrf_token %}
-                <table>{{ form | crispy}}</table>
+                <table>{{ form | crispy }}</table>
                 <button class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" type="submit">
                         <span aria-hidden="true">Submit</span>
                 </button>

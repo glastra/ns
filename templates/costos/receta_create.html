@@ -8,25 +8,35 @@
 <div class="text-center"><h1 class="h3 mb-0 text-gray-800">Nueva Receta</h1>
  </div>
  <body class="bg-gradient-primary">
-  <div class="container">
-   <div class="row justify-content-center">
-     <div class="col-xl-10 col-lg-12 col-md-9">
-       <div class="card o-hidden border-0 shadow-lg my-5">
-         <div class="card-body p-3">
-           <div class="form-group">
-             <form method="post" >
-                {% csrf_token %}
-                <table>{{ form | crispy }}</table>
-                <button class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" type="submit">
-                        <span aria-hidden="true">Submit</span>
-                </button>
-             </form>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-12 col-md-9">
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-3">
+                        <div class="form-group">
+                            <form action="" method="POST">
+                                {% for hidden_field in form.hidden_fields %}
+                                    {{hidden_field.errors }}
+                                    {{ hidden_field }}
+                                {% endfor %}
+
+                                {% csrf_token %}
+                                {{ form.non_form_errors }}
+                                {% for field in form %}
+                                    {{ field.errors }}
+                                    {{ field.label_tag }} {{field }}
+                                {% endfor %}
+                                <p class="pt-2">
+                                    <button type="submit" class="btn btn-primary w-100 mb-2">Add Receta</button>
+                                    <a href="{% url 'home' %}" role="button" class="btn btn-secondary w-100">Cancel</a>
+                                </p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-         </div>
-       </div>
-     </div>
-   </div>
-  </div>
+        </div>
+    </div>
  </body>
 {% endblock %}}
 

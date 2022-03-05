@@ -1,18 +1,26 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib import messages
 from django.forms import ModelForm
-from django.shortcuts import render, redirect, reverse
-from django.views import View
+from django.shortcuts import render, redirect, reverse, HttpResponseRedirect
+from django.views.generic import (TemplateView, CreateView, DetailView, FormView)
 from django.views.generic.list import ListView
 from django.shortcuts import render
-from .models import Ingredient,  Receta, Restaurant, Provider
-from .forms import ProviderForm, UserForm,  RestaurantForm, IngredientForm, RecetaForm, NewUserForm, StepsForm
+from .models import Ingredient,  Receta, Restaurant, Provider, Steps
+from .forms import ProviderForm, UserForm,  RestaurantForm, IngredientForm, StepsForm
+from .forms import RecetaStepsFormset, NewUserForm
 
+from django.views.generic.detail import SingleObjectMixin
+from django.http import HttpResponseRedirect
 from formtools.wizard.views import WizardView
 
+
 # Create your views here.
+class HomeView(TemplateView):
+    template_name = 'home.html'
+
+
 def index(request):
     return render(request, 'costos/index.html')
 
@@ -35,6 +43,7 @@ def user_create(request):
 
 class ProviderListView(LoginRequiredMixin, ListView):
     model = Provider
+    template_name = 'provider_list.html'
 
 
 def provider_create(request):
@@ -50,6 +59,17 @@ def provider_create(request):
     }
     return render(request, "costos/provider_create.html",
                   context)
+
+
+def provider_detail(request, pk):
+    provider = Provider.objects.get(pk=pk)
+
+    if request.method == 'POST':
+        Provider.save
+
+        return redirect('provider_list')
+
+    return render(request, 'costos/provider_detail.html', {'provider': provider})
 
 
 def restaurant_create(request):
@@ -69,6 +89,26 @@ def restaurant_create(request):
     return render(request, "costos/restaurant_create.html", context)
 
 
+def restaurant(request):
+    return render(request, 'costos/restaurant.html')
+
+
+class RestaurantListView(ListView):
+    model = Restaurant
+    template_name = 'restaurant_list.html'
+
+
+def restaurant_detail(request, pk):
+    restaurant = Restaurant.objects.get(pk=pk)
+
+    if request.method == 'POST':
+        Restaurant.save
+
+        return redirect('provider_list')
+
+    return render(request, 'costos/restaurant_detail.html', {'restaurant': restaurant})
+
+
 def ingredient_create(request):
 
     if request.method == 'POST':
@@ -83,11 +123,12 @@ def ingredient_create(request):
     context = {
         'form': form
     }
-    return render(request, "costos/ingredient_create.html",context)
+    return render(request, "costos/ingredient_create.html", context)
 
 
 class IngredientListView(ListView):
     model = Ingredient
+    template_name = 'ingredient_list.html'
 
 
 def ingredient_detail(request, pk):
@@ -99,10 +140,6 @@ def ingredient_detail(request, pk):
         return redirect('ingredient_list')
 
     return render(request, 'costos/ingredient_detail.html', {'ingredient': ingredient})
-
-
-class ProviderListView(ListView):
-    model = Provider
 
 
 def provider_detail(request, pk):
@@ -127,94 +164,36 @@ def provider_create(request):
                   context)
 
 
-def restaurant(request):
-    return render(request, 'costos/restaurant.html')
+class RecetaCreateView(CreateView):
+    model = Receta
+    template_name = 'costos/receta_create.html'
+    fields = [
+        'name',
+        'portions',
+        'chef',
+        'restaurant',
+        'errormargin',
+        'items'
+    ]
 
+    def form_valid(self, form):
 
-class RestaurantListView(ListView):
-    model = Restaurant
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            'The receta has been added'
+        )
 
-
-def restaurant_detail(request, pk):
-    restaurant = Restaurant.objects.get(pk=pk)
-
-    if request.method == 'POST':
-        Restaurant.save
-
-        return redirect('provider_list')
-
-    return render(request, 'costos/restaurant_detail.html', {'restaurant': restaurant})
+        return super().form_valid(form)
 
 
 class RecetaListView(ListView):
     model = Receta
 
 
-class RecetaCreateForm(ModelForm):
-
-    class Meta:
-        model = Receta
-        exclude = ['restaurant', 'items']
-        fields = [
-            'name',
-            'description',
-            'portions',
-        ]
-
-    def __init__(self, request, *args, ** kwargs):
-        super(RecetaCreateForm, self).__init__(*args, **kwargs)
-
-    def save(self, commit=True, **kwargs):
-
-        r_create_form = super(Receta, self).save(commit=False)
-        r_create_form.restaurant = 'NS restaurante'
-        if commit:
-            r_create_form.save()
-        return r_create_form
-
-
-
-
-class RecetaAddView(LoginRequiredMixin, View):
-
+class RecetaDetailView(DetailView):
     model = Receta
-
-    def get(self, request, *args, **kwargs):
-        form = RecetaCreateForm(request)
-        context = {'form': form}
-        return render(request, 'costos/receta_create.html', context)
-
-    def post(self, request, *args, **kwargs):
-        form = RecetaCreateForm(request.POST)
-        form.instance.user = request.user
-        if form.is_valid():
-            form.save()
-            return redirect(reverse('costos:index'))
-
-def receta(request):
-    return render(request, 'costos/receta.html')
-
-
-def receta_create(request):
-    form = RecetaForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-    context = {
-        'form': form
-    }
-    return render(request, "costos/receta_create.html",
-                  context)
-
-
-def receta_detail(request, pk):
-    receta = Receta.objects.get(pk=pk)
-
-    if request.method == 'POST':
-        receta.save
-
-        return redirect('recetalist')
-
-    return render(request, 'costos/restaurant_detail.html', {'restaurant': restaurant})
+    template_name = 'costos/receta_detail.html'
 
 
 def steps_create(request):
@@ -235,6 +214,23 @@ def steps_create(request):
         'form': form
     }
     return render(request, "costos/steps_create.html", context)
+
+
+def steps_detail(request, pk):
+    steps = Steps.objects.get(pk=pk)
+
+    if request.method == 'POST':
+        Steps.save
+
+        return redirect('steps_list')
+
+    return render(request, 'costos/steps_detail.html', {'steps': steps})
+
+
+
+class StepListView(ListView):
+    model = Steps
+
 
 
 def login_request(request):
@@ -307,3 +303,35 @@ def forgot_password(request):
 
 def dashboard(request):
     return render(request, 'costos/dashboard.html')
+
+class RecetaStepsEditView(SingleObjectMixin, FormView):
+
+    model = Receta
+    template_name = 'costos/receta_steps_edit.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Receta.objects.all())
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Receta.objects.all())
+        return super().post(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+        return RecetaStepsFormset(**self.get_form_kwargs(), instance=self.object)
+
+    def form_valid(self, form):
+        form.save()
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            'Changes made'
+        )
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('receta_detail', kwargs={'pk': self.object.pk})
+
+

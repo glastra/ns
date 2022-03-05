@@ -4,12 +4,21 @@
 {% block meta_desc %} A&B Cost {% endblock %}
 {% block title %} A&B Cost - Ingredient Detail {% endblock %}
 {%block content %}
+    {% if message %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 <h1>Ingredient</h1>
-<p>{{ ingredient.id }}</p>
-<p>{{ ingredient.name }}</p>
-        <hr>
-        <form method="post" action="{% url 'ingredient_detail' ingredient.id %}">
-            {% csrf_token %}
-        </form>
-       <hr>
+<h2>{{ ingredient.id }} {{ ingredient.type}}</h2>
+<hr>
+    {% for ingredient in steps.steps_ingredient.all %}
+        <p>{{ingredient.id}} </p>
+    {% endfor %}
+<p>
+    <a href="{% url 'ingredient_steps_edit' pk=ingredient.pk %}" role="button" class="btn btn-primary w-100 mb-2">Edit Items</a>
+    <a href="{% url 'IngredientViewList' %}" role="button" class="btn btn-secundary w-100">Ingredients</a>
+</p>
 {% endblock %}}

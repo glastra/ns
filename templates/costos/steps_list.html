@@ -1,0 +1,31 @@
+{% extends 'costos/base.html' %}
+{% load i18n %}
+{%load static %}
+{% block meta_desc %} A&B Cost {% endblock %}
+{% block title %} A&B Cost - Steps {% endblock %}
+{%block content %}
+  <!-- Page Heading -->
+   <div class="d-sm-flex align-items-center justify-content-between mb-4">
+       <h1 class="h3 mb-0 text-gray-800">{% trans "Steps" %}</h1>
+       <a href="{% url 'steps_create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+              {% trans "Nuevo Paso" %}</a>
+   </div>
+  <div class="row">
+	  {% for object in object_list %}
+   <div class="col-xl-3 col-md-6 mb-4">
+  		<div class="card border-left-primary shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col mr-2">
+						<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+						{{object.description}}</div>
+						<div class="h5 mb-0 font-weight-bold text-gray-800">{{ object.name }} {{ object.id }}</div>
+                       </div>
+                   </div>
+			</div>
+           </div>
+   </div>
+{% endfor %}
+ </div>
+
+{% endblock %}}
