@@ -1,0 +1,47 @@
+{% extends 'costos/base.html' %}
+{% load i18n %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block meta_desc %} A&B Cost {% endblock %}
+{% block title %} A&B Cost - Edit Steps {% endblock %}
+{%block content %}
+    <style>
+        .steps_form{
+            border-bottom: 1px solid black;
+        }
+        .hidden{
+            display:none
+        }
+    </style>
+    {% if message %}
+    <p>{{ message}}</p>
+    {% endif %}
+    <div style="margin-top:30px" >
+    <form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="{% if field.field.required %}{{form.required_css_class}}{%endif%}">
+            {{ field.errors }}
+            {{ field.label_tag }}{{ field }}
+            {% if field.hel_text %}
+                <p class="help">{{ field.help_text | safe }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        {{ form.non_form_errors }}
+        {% if formset %}
+        <h3>Receta Steps</h3>
+        {{ form.management_form }}
+        {% for form in formset %}
+            <div class="steps_form">
+                {{form.as_p}}
+            </div>
+        {% endfor %}
+        <div id="empty-form" class="hidden">{{formset.empty_form}}</div>
+        <button id="add-more" type="button">Add more </button>
+        {% endif %}
+        <button style="margin-top:10px" type="submit"> Save </button>
+    </form>
+    </div>
+{% endblock %}}

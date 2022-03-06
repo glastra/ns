@@ -2,14 +2,14 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
-from django.forms import ModelForm
-from django.shortcuts import render, redirect, reverse, HttpResponseRedirect
+from django.forms import ModelForm, inlineformset_factory, modelformset_factory
+from django.shortcuts import render, redirect, reverse, HttpResponseRedirect, get_object_or_404
 from django.views.generic import (TemplateView, CreateView, DetailView, FormView)
 from django.views.generic.list import ListView
 from django.shortcuts import render
 from .models import Ingredient,  Receta, Restaurant, Provider, Steps
-from .forms import ProviderForm, UserForm,  RestaurantForm, IngredientForm, StepsForm
-from .forms import RecetaStepsFormset, NewUserForm
+from .forms import UserForm,  RestaurantForm, IngredientForm, StepsForm, ProviderForm, RecetaForm
+from .forms import RecetaStepsFormset, NewUserForm, IngredientEditForm, ProviderIngredientsFormset
 
 from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponseRedirect
@@ -41,35 +41,45 @@ def user_create(request):
                   context)
 
 
-class ProviderListView(LoginRequiredMixin, ListView):
+class ProviderCreateView(CreateView):
+    model = Provider
+    template_name = 'costos/provider_create.html'
+    fields = [
+        'name',
+        'description',
+        'email',
+
+    ]
+
+    def form_valid(self, form):
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            'The provider has been added'
+        )
+
+        return super().form_valid(form)
+
+
+class ProviderDetailView(DetailView):
+    model = Provider
+    template_name = 'costos/provider_detail.html'
+
+    def form_valid(self, form):
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            'The Provider has been added'
+        )
+
+        return super().form_valid(form)
+
+
+class ProviderListView(ListView):
     model = Provider
     template_name = 'provider_list.html'
-
-
-def provider_create(request):
-    if request.method == 'POST':
-        form = ProviderForm(request.POST)
-        if form.is_valid():
-            form.save()
-            redirect('provider_list')
-    else:
-        form = ProviderForm()
-    context = {
-        'form': form
-    }
-    return render(request, "costos/provider_create.html",
-                  context)
-
-
-def provider_detail(request, pk):
-    provider = Provider.objects.get(pk=pk)
-
-    if request.method == 'POST':
-        Provider.save
-
-        return redirect('provider_list')
-
-    return render(request, 'costos/provider_detail.html', {'provider': provider})
 
 
 def restaurant_create(request):
@@ -142,28 +152,6 @@ def ingredient_detail(request, pk):
     return render(request, 'costos/ingredient_detail.html', {'ingredient': ingredient})
 
 
-def provider_detail(request, pk):
-    provider = Provider.objects.get(pk=pk)
-
-    if request.method == 'POST':
-        Provider.save
-
-        return redirect('provider_list')
-
-    return render(request, 'costos/provider_detail.html', {'provider': provider})
-
-
-def provider_create(request):
-    form = ProviderForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-    context = {
-        'form': form
-    }
-    return render(request, "costos/provider_create.html",
-                  context)
-
-
 class RecetaCreateView(CreateView):
     model = Receta
     template_name = 'costos/receta_create.html'
@@ -176,7 +164,7 @@ class RecetaCreateView(CreateView):
         'items'
     ]
 
-    def form_valid(self, form):
+    def is_valid(self, form):
 
         messages.add_message(
             self.request,
@@ -184,7 +172,7 @@ class RecetaCreateView(CreateView):
             'The receta has been added'
         )
 
-        return super().form_valid(form)
+        return super().is_valid(form)
 
 
 class RecetaListView(ListView):
@@ -194,6 +182,16 @@ class RecetaListView(ListView):
 class RecetaDetailView(DetailView):
     model = Receta
     template_name = 'costos/receta_detail.html'
+
+    def form_valid(self, form):
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            'The receta has been added'
+        )
+
+        return super().form_valid(form)
 
 
 def steps_create(request):
@@ -230,7 +228,7 @@ def steps_detail(request, pk):
 
 class StepListView(ListView):
     model = Steps
-
+    template_name = 'steps_list'
 
 
 def login_request(request):
@@ -304,10 +302,11 @@ def forgot_password(request):
 def dashboard(request):
     return render(request, 'costos/dashboard.html')
 
+
 class RecetaStepsEditView(SingleObjectMixin, FormView):
 
     model = Receta
-    template_name = 'costos/receta_steps_edit.html'
+    template_name = 'costos/receta_steps_update.html'
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=Receta.objects.all())
@@ -335,3 +334,123 @@ class RecetaStepsEditView(SingleObjectMixin, FormView):
         return reverse('receta_detail', kwargs={'pk': self.object.pk})
 
 
+def receta_steps_update(request, pk):
+    obj = get_object_or_404(Receta, pk=pk)
+   # obj = Receta.objects.get(pk=pk)
+    form = RecetaForm()
+    RecetaStepsFormset = modelformset_factory(Steps, form=StepsForm, extra=2)
+    qs = obj.items.all()
+    formset = RecetaStepsFormset(request.POST or None, queryset=qs)
+    context = {
+        'form' : form,
+        'formset': formset,
+        'object' : obj
+    }
+    if all([form.is_valid(), formset.is_valid()]):
+        parent = form.save(commit=False)
+        parent.save()
+        for form in formset:
+            child = form.save(commit=False)
+            child.receta = parent
+            child.save()
+        context['message'] = 'Data saved'
+    return render(request, "costos/receta_steps_update.html", context)
+
+
+
+
+class IngredientEditView(SingleObjectMixin, FormView):
+
+    model = Ingredient
+    template_name = 'costos/ingredient_edit.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Ingredient.objects.all())
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Ingredient.objects.all())
+        return super().post(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+         return IngredientEditForm(**self.get_form_kwargs(), instance=self.object)
+
+    def form_valid(self, form):
+        form.save()
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            'Changes made'
+        )
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('ingredient_detail', kwargs={'pk': self.object.pk})
+
+
+class ProviderIngredientsEditView(SingleObjectMixin, FormView):
+
+    model = Provider
+    template_name = 'costos/provider_ingredients_edit.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Provider.objects.all())
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Provider.objects.all())
+        return super().post(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+        return ProviderIngredientsFormset(**self.get_form_kwargs(), instance=self.object)
+
+    def form_valid(self, form):
+        form.save()
+
+        messages.add_message(
+        self.request,
+        messages.SUCCESS,
+        'Changes made'
+        )
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('provider_detail', kwargs={'pk': self.object.pk})
+
+
+def provider_ingredients_edit(request, provider_pk, ingredient_pk, *args, **kwargs):
+    provider = get_object_or_404(Provider, pk=provider_pk)
+    ingredient = get_object_or_404(Ingredient, pk=ingredient_pk, provider=provider)
+
+    IngredientFormSet = inlineformset_factory(
+        Provider,  # parent model
+        Ingredient,  # base model
+        fields=('name', 'description'),
+        min_num=2,
+        validate_min=True,
+        max_num=10,
+        validate_max=True
+    )
+
+    if request.method == 'POST':
+        form = ProviderForm(request.POST, instance=provider)
+        formset = IngredientFormSet(request.POST, instance=provider)
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            messages.success(request, 'Provider and ingredients saved with success!')
+            return redirect('provider_detail', provider.pk)
+
+        else:
+            form = ProviderForm(instance=provider)
+            formset = IngredientFormSet(instance=provider)
+
+        return render(request, 'costos/provider_ingredients_edit.html', {
+            'provider': provider,
+            'ingredient': ingredient,
+            'form': form,
+            'formset': formset
+        })

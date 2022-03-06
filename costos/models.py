@@ -77,13 +77,14 @@ class Provider(models.Model):
     phone = models.CharField(_('Phone'), max_length=12)
     web = models.CharField(_('Web'), max_length=250, blank=True)
 
+    def get_absolute_url(self):
+        return reverse('provider_detail', kwargs={
+            'pk': self.pk
+            })
+
     def __str__(self):
         return self.name
 
-    def get_absolute_url(self):
-        return reverse('Provider:detail', kwargs={
-                'id': self.id
-            })
 
 
 class Ingredient(models.Model):
@@ -179,7 +180,7 @@ class Steps(models.Model):
         return self.ingredient.name
 
     def get_absolute_url(self):
-        return reverse('Step:detail', kwargs={
-            'id': self.id
+        return reverse('receta_steps_update', kwargs={
+            'pk': self.pk
        })
 

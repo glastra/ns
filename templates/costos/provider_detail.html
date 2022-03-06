@@ -2,14 +2,26 @@
 {% load i18n %}
 {%load static %}
 {% block meta_desc %} A&B Cost {% endblock %}
-{% block title %} A&B Cost - Provier Detail {% endblock %}
+{% block title %} {{ provider.name }} Details {% endblock %}
 {%block content %}
-<h1>Provider</h1>
-<p>{{ provider.id }}</p>
-<p>{{ provider.name }}</p>
-        <hr>
-        <form method="post" action="{% url 'provider_detail' provider.id %}">
-            {% csrf_token %}
-        </form>
-       <hr>
-{% endblock %}}
+    {% if message %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+<h3>{{provider.name}} Details</h3>
+<div class="d-flex d-flex-inline"><span class="">Email:</span><h5>{{provider.email}}</h5></div>
+<hr>
+    {% for ingredient in provider.Ingredient_provider.all %}
+    <a class="text-reset" href="{% url 'ingredient_detail' ingredient.id %}" >Ingredient Id: {{ ingredient.id}}</a>
+    <div> Name: {{ ingredient.name }}</div>
+    <div> Price: {{ ingredient.price }}</div>
+    <hr>
+    {% endfor %}
+<p>
+    <a href="{% url 'provider_ingredients_edit' pk=provider.pk %}" role="button" class="btn btn-primary w-100 mb-2">Edit Provider Ingredients</a>
+    <a href="{% url 'provider_list' %}" role="button" class="btn btn-secundary w-100">Cancel</a>
+</p>
+{% endblock content %}}

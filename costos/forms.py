@@ -8,6 +8,16 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, Hidden
 
 
+RecetaStepsFormset = inlineformset_factory(Receta, Steps, fields=('preparation', 'qty','ingredient',))
+
+ProviderIngredientsFormset = inlineformset_factory(
+    Provider,
+    Ingredient,
+    can_delete=True,
+    extra=3,
+    fields=('name', 'price', 'type','presentation',)
+)
+
 class UserForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
@@ -69,6 +79,22 @@ class IngredientForm(forms.ModelForm):
         ]
 
 
+class IngredientEditForm(forms.ModelForm):
+
+    class Meta:
+        model = Ingredient
+        fields = [
+            'provider',
+            'description',
+            'presentation',
+            'type',
+            'price',
+            'qty',
+            'error',
+
+        ]
+
+
 class RecetaForm(forms.ModelForm):
 
     class Meta:
@@ -109,7 +135,7 @@ class RecetaCreateForm(ModelForm):
         return r_create_form
 
 
-RecetaStepsFormset = inlineformset_factory(Receta, Steps, fields=('preparation', 'qty',))
+
 
 
 class StepsForm(forms.ModelForm):

@@ -12,13 +12,10 @@
         </ul>
     {% endif %}
 <h1>Ingredient</h1>
-<h2>{{ ingredient.id }} {{ ingredient.type}}</h2>
-<hr>
-    {% for ingredient in steps.steps_ingredient.all %}
-        <p>{{ingredient.id}} </p>
-    {% endfor %}
+<h2>{{ ingredient.name }} {{ ingredient.type}}</h2>
+
 <p>
-    <a href="{% url 'ingredient_steps_edit' pk=ingredient.pk %}" role="button" class="btn btn-primary w-100 mb-2">Edit Items</a>
+    <a href="{% url 'ingredient_edit' pk=ingredient.pk %}" role="button" class="btn btn-primary w-100 mb-2">Edit Ingredient</a>
     <a href="{% url 'IngredientViewList' %}" role="button" class="btn btn-secundary w-100">Ingredients</a>
 </p>
 {% endblock %}}
