@@ -3,7 +3,7 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block meta_desc %} A&B Cost {% endblock %}
-{% block title %} A&B Cost - Edit Steps {% endblock %}
+{% block title %} A&B Cost - {{ receta.name }}  Steps {% endblock %}
 {%block content %}
     <style>
         .steps_form{
@@ -29,19 +29,41 @@
         </div>
         {% endfor %}
 
-        {{ form.non_form_errors }}
         {% if formset %}
-        <h3>Receta Steps</h3>
-        {{ form.management_form }}
+        <h3>Steps</h3>
+        {{ formset.management_form }}
+        <div id="steps-form-list">
         {% for form in formset %}
-            <div class="steps_form">
-                {{form.as_p}}
+            <div class="steps-form">
+                {{ form }}
             </div>
-        {% endfor %}
-        <div id="empty-form" class="hidden">{{formset.empty_form}}</div>
-        <button id="add-more" type="button">Add more </button>
+            {% endfor %}
+        </div>
+        <div id="empty-form" class="">{{formset.empty_form }}</div>
+        <button id="add-more" class="d-none d-sm-inline-block btn-sm btn-secondary w-20 shadow-sm" type="button"> + </button>
         {% endif %}
-        <button style="margin-top:10px" type="submit"> Save </button>
+        <hr>
+        <button type="submit" class="btn btn-primary w-100 mb-2">Save</button>
     </form>
     </div>
+    <script>
+
+        const addMoreBtn = document.getElementById('add-more')
+        const totalNewForms = document.getElementById('steps_receta-TOTAL_FORMS')
+
+        addMoreBtn.addEventListener('click',add_new_form)
+        function add_new_form(event){
+            if (event){
+                event.preventDefault()
+            }
+            const currentStepsForms = document.getElementsByClassName('steps-form')
+            const currentFormCount = currentStepsForms.length
+            const formCopyTarget = document.getElementById('steps-form-list')
+            const copyEmptyFormEl = document.getElementById('empty-form').cloneNode(true)
+            copyEmptyFormEl.setAttribute('class','steps-form')
+            copyEmptyFormEl.setAttribute('id','')
+            formCopyTarget.append(copyEmptyFormEl)
+        }
+
+    </script>
 {% endblock %}}

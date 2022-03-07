@@ -8,7 +8,7 @@ from django.views.generic import (TemplateView, CreateView, DetailView, FormView
 from django.views.generic.list import ListView
 from django.shortcuts import render
 from .models import Ingredient,  Receta, Restaurant, Provider, Steps
-from .forms import UserForm,  RestaurantForm, IngredientForm, StepsForm, ProviderForm, RecetaForm
+from .forms import UserForm,  RestaurantForm, IngredientForm, StepsForm, ProviderForm, RecetaCreateForm
 from .forms import RecetaStepsFormset, NewUserForm, IngredientEditForm, ProviderIngredientsFormset
 
 from django.views.generic.detail import SingleObjectMixin
@@ -334,28 +334,46 @@ class RecetaStepsEditView(SingleObjectMixin, FormView):
         return reverse('receta_detail', kwargs={'pk': self.object.pk})
 
 
-def receta_steps_update(request, pk):
-    obj = get_object_or_404(Receta, pk=pk)
-   # obj = Receta.objects.get(pk=pk)
-    form = RecetaForm()
-    RecetaStepsFormset = modelformset_factory(Steps, form=StepsForm, extra=2)
-    qs = obj.items.all()
-    formset = RecetaStepsFormset(request.POST or None, queryset=qs)
-    context = {
-        'form' : form,
-        'formset': formset,
-        'object' : obj
-    }
-    if all([form.is_valid(), formset.is_valid()]):
-        parent = form.save(commit=False)
-        parent.save()
-        for form in formset:
-            child = form.save(commit=False)
-            child.receta = parent
-            child.save()
-        context['message'] = 'Data saved'
-    return render(request, "costos/receta_steps_update.html", context)
+# def receta_steps_update(request, pk):
+#     receta = get_object_or_404(Receta, pk=pk)
+#     form = RecetaCreateForm(request.POST or None, instance=receta)
+#     RecetaStepsFormset = modelformset_factory(Steps, form=StepsForm, extra=2)
+#     qs = receta.items.all()
+#     formset = RecetaStepsFormset(request.POST or None, queryset=qs)
+#     context = {
+#         'form': form,
+#         'formset': formset,
+#         'object': receta
+#     }
+#     if request.method == "POST":
+#        print(request.POST)
+#     if all([form.is_valid(), formset.is_valid()]):
+#         parent = form.save(commit=False)
+#         parent.save()
+#         for form in formset:
+#             child = form.save(commit=False)
+#             child.receta = parent
+#             child.save()
+#         context['message'] = 'Data saved'
+#     return render(request, "costos/receta_steps_update.html", context)
 
+
+
+def receta_steps_update(request, pk):
+    receta = get_object_or_404(Receta, pk=pk)
+    RecetaStepsFormset = inlineformset_factory(Receta, Steps, fields=('ingredient','qty',))
+
+    if request.method == "POST":
+        print(request.POST)
+        formset = RecetaStepsFormset(request.POST, instance=receta)
+        if formset.is_valid():
+            formset.save()
+
+            return redirect('receta_detail', receta.pk)
+
+    formset = RecetaStepsFormset(instance=receta)
+
+    return render(request, "costos/receta_steps_update.html", {'formset': formset})
 
 
 

@@ -18,7 +18,7 @@
          <p>{{items.id}} {{ items.qty }} {{ items.error }}</p>
     {% endfor %}
 <p>
-    <a href="{% url 'receta_steps_update' pk=receta.pk  %}" role="button" class="btn btn-primary w-100 mb-2">Edit Steps</a>
+    <a href="{% url 'receta_steps_update' receta.pk %}" role="button" class="btn btn-primary w-100 mb-2">Edit Steps</a>
     <a href="{% url 'RecetaViewList' %}" role="button" class="btn btn-secundary w-100">Recetas</a>
 </p>
 {% endblock %}}
