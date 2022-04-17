@@ -4,12 +4,47 @@
 {% block meta_desc %} A&B Cost {% endblock %}
 {% block title %} A&B Cost - Company Detail {% endblock %}
 {%block content %}
-<h1>Company</h1>
-<p>{{ company.id }}</p>
-<p>{{ company.name }}</p>
-        <hr>
-        <form method="post" action="{% url 'company_detail' company.id %}">
-            {% csrf_token %}
-        </form>
-       <hr>
+<body class="bg-gradient-primary" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+  <div class="container">
+   <div class="row justify-content-center">
+     <div class="col-xl-10 col-lg-12 col-md-9">
+         <div>
+             <a href="{% url 'ingredient_create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                    {% trans "+ Ingredient" %}</a>
+             <a href="{% url 'provider_create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+              {% trans "+ Provider" %}</a>
+             <a href="{% url 'add_recipe' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+              {% trans "+ Recipe" %}</a>
+         </div>
+         <div class="card o-hidden border-1 shadow-lg my-5">
+            <div class="card-body p-3">
+                <div class="row">
+                    <div class="col">
+
+                        <div class="text-center">
+                            {% if message %}
+                                <ul class="messages">
+                                    {% for message in messages %}
+                                        <li>{{ message }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                        <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">{{ company.name }} </h6>
+                        </div>
+                        <h1>{{ company.owner }}</h1>
+                            <h2> {{ company.description }}</h2>
+                                <h3> {{ company.identification }}</h3>
+                                    <h4> {{ company.country }}</h4>
+                                             <p>
+                                                {{ company.extra_street }}
+                                                {{ company.street }} {{ company.city }} {{ company.state }}
+                                            </p>
+                    </div></div></div></div>
+                    <p>
+                        <a href="{% url 'company_edit' pk=company.pk %}" role="button" class="btn btn-primary w-100 mb-2">Edit Company</a>
+                        <a href="{% url 'company_list' %}" role="button" class="btn btn-secundary w-100">Companies</a>
+                    </p>
+     </div></div></div></body>
 {% endblock %}}

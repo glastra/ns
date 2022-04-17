@@ -7,8 +7,9 @@
 {%block content %}
 <div class="text-center"><h1 class="h3 mb-0 text-gray-800">COST Home Class View</h1>
  </div>
-<h1>{% translate "name" %}</h1>
-   <p>{% translate "description" %}</p>
+
+  <h1>{% translate 'name' %}</h1>
+   <p>{% translate 'description' %}</p>
     {% get_current_language as CURRENT_LANGUAGE %}
       {% get_available_languages as AVAILABLE_LANGUAGES %}
       {% get_language_info_list for AVAILABLE_LANGUAGES as languages %}
@@ -24,7 +25,7 @@
             </li>
           {% endfor %}
         </ul>
+          {{myrecipe}}
       </div>
-
 
 {% endblock %}}

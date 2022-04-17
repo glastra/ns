@@ -1,14 +1,21 @@
+from crispy_forms.bootstrap import PrependedText
 from django import forms
-from .models import  Restaurant, Provider, Ingredient, Receta, Steps
+from django_quill.forms import QuillFormField
+from .models import  Restaurant, Provider, Ingredient, Recipe, Step, Company
 from django.forms import ModelForm, HiddenInput
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.forms.models import inlineformset_factory
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, Hidden
+from crispy_forms.bootstrap import PrependedText
+from django_countries.widgets import CountrySelectWidget
 
 
-RecetaStepsFormset = inlineformset_factory(Receta, Steps, fields=('preparation', 'qty','ingredient',))
+class QuillFieldForm(forms.Form):
+    content = QuillFormField()
+
+RecipeStepFormset = inlineformset_factory(Recipe, Step, fields=('preparation', 'qty1', 'qty2', 'ingredient',))
 
 ProviderIngredientsFormset = inlineformset_factory(
     Provider,
@@ -18,12 +25,50 @@ ProviderIngredientsFormset = inlineformset_factory(
     fields=('name', 'price', 'type','presentation',)
 )
 
+
 class UserForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = [
-            'account_id',
             'phone',
+
+        ]
+
+
+class CompanyForm(forms.ModelForm):
+
+    class Meta:
+        model = Company
+        fields = [
+            'name',
+            'description',
+            'owner',
+            'identification',
+            'country',
+            'extra_street',
+            'street',
+            'city',
+            'state',
+
+
+        ]
+        widgets = {'country': CountrySelectWidget()}
+
+
+class CompanyEditForm(forms.ModelForm):
+
+    class Meta:
+        model = Company
+        fields = [
+            'name',
+            'description',
+            'owner',
+            'identification',
+            'country',
+            'extra_street',
+            'street',
+            'city',
+            'state',
 
         ]
 
@@ -39,10 +84,29 @@ class ProviderForm(forms.ModelForm):
             'street',
             'city',
             'state',
-            'zip_code',
+            'zipcode',
             'contact',
             'email',
             'web',
+        ]
+
+
+class ProviderEditForm(forms.ModelForm):
+
+    class Meta:
+        model = Provider
+        fields = [
+            'name',
+            'description',
+            'extra_street',
+            'street',
+            'city',
+            'state',
+            'zipcode',
+            'contact',
+            'email',
+            'web',
+
         ]
 
 
@@ -53,11 +117,31 @@ class RestaurantForm(forms.ModelForm):
         fields = [
             'name',
             'description',
+            'country',
             'extra_street',
             'street',
             'city',
             'state',
-            'chefs'
+            'chef',
+
+        ]
+        widgets = {'country': CountrySelectWidget()}
+
+
+class RestaurantEditForm(forms.ModelForm):
+
+    class Meta:
+        model = Restaurant
+        fields = [
+            'name',
+            'description',
+            'country',
+            'extra_street',
+            'street',
+            'city',
+            'state',
+            'chef',
+
         ]
 
 
@@ -65,6 +149,7 @@ class IngredientForm(forms.ModelForm):
 
     class Meta:
         model = Ingredient
+        exclude = ['qty2', ]
         fields = [
 
             'provider',
@@ -73,32 +158,59 @@ class IngredientForm(forms.ModelForm):
             'presentation',
             'type',
             'price',
-            'qty',
-            'error',
+            'qty1',
+            'decrease',
 
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+
+        self.helper.layout = Layout(
+            PrependedText('price', '$')
+             )
 
 
 class IngredientEditForm(forms.ModelForm):
 
     class Meta:
         model = Ingredient
+        exclude = ['qt2']
         fields = [
             'provider',
             'description',
             'presentation',
             'type',
             'price',
-            'qty',
-            'error',
+            'qty1',
+            'decrease',
 
         ]
 
+    def __init__(self, *args, **kwargs):
+        super(IngredientEditForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
 
-class RecetaForm(forms.ModelForm):
+        self.helper.layout = Layout(
+            PrependedText('price', '$')
+            )
+
+    # def save(self, commit=True, **kwargs):
+    #     # i_create_form = super(Ingredient, self).save(commit=True)
+    #     # if i_create_form.qyt2 > i_create_form.qty1:
+    #     #     i_create_form.qyt2 = i_create_form.qty1
+    #     # if not commit:
+    #     #     raise NotImplementedError("Can't create ingredient  without config save")
+    #
+    #     i_create_form.save()
+    #     return i_create_form
+
+
+class RecipeForm(forms.ModelForm):
 
     class Meta:
-        model = Receta
+        model = Recipe
         fields = [
             'name',
             'description',
@@ -106,46 +218,95 @@ class RecetaForm(forms.ModelForm):
         ]
 
 
-class RecetaCreateForm(ModelForm):
+class RecipeCreateForm(ModelForm):
 
     class Meta:
-        model = Receta
-        exclude = ['restaurant', 'items']
+        model = Recipe
+        exclude = ['restaurant']
         fields = [
             'name',
             'description',
             'portions',
-            'errormargin',
+            'margin_error',
         ]
 
     def __init__(self, request, *args, ** kwargs):
-        super(RecetaCreateForm, self).__init__(*args, **kwargs)
+        super(RecipeCreateForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_id = 'id-recetaCreateForm'
+
+        self.helper.form_id = 'id-recipeCreateForm'
         self.helper.form_tag = False
 
     def save(self, commit=True, **kwargs):
-        r_create_form = super(Receta, self).save(commit=False)
-        r_create_form.restaurant = 'NS restaurante'
-        if commit:
-            r_create_form.save()
+        r_create_form = super(Recipe, self).save(commit=True)
+        r_create_form.restaurant = 'NS restaurant'
+
+        if not commit:
+            raise NotImplementedError("Can't create recipe without an ingredient")
+
+        r_create_form.save()
         return r_create_form
 
 
-
-
-
-class StepsForm(forms.ModelForm):
+class RecipeEditForm(forms.ModelForm):
 
     class Meta:
-        model = Steps
+        model = Recipe
+        exclude = ['items', 'chef']
+        fields = [
+            'restaurant',
+            'name',
+            'description',
+            'portions',
+            'margin_error',
+            'menu_price',
+            'is_complete',
+            'is_track',
+
+        ]
+        widgets = {'description': QuillFieldForm()}
+
+
+class StepForm(forms.ModelForm):
+
+    class Meta:
+        model = Step
+        exclude = ['decrease', 'qty2']
         fields = [
             'ingredient',
-            'qty',
-            'error',
+            'qty1',
+            'qty2',
+            'decrease',
             'preparation',
             'duration',
         ]
+
+
+class StepCreateForm(forms.ModelForm):
+
+    class Meta:
+        model = Step
+        exclude = ['qty2']
+        fields = [
+            'ingredient',
+            'qty1',
+            'qty2',
+            'decrease',
+            'preparation',
+            'duration',
+        ]
+
+
+
+# class StepFormSetHelper(FormHelper):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.form_method = 'post'
+#         self.layout = Layout(
+#             'ingredient',
+#             'qty1',
+#         )
+#         self.render_required_fields = True
 
 
 class NewUserForm(UserCreationForm):

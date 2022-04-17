@@ -5,34 +5,42 @@
 {% block title %} A&B Cost - Ingredientes {% endblock %}
 {%block content %}
  <!-- Page Heading -->
-   <div class="d-sm-flex align-items-center justify-content-between mb-4">
-       <h1 class="h3 mb-0 text-gray-800">{% trans "Ingredients" %}</h1>
-       <a href="{% url 'ingredient_create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-              {% trans "+ Ingredient" %}</a>
-   </div>
-{% if ingredient_list %}
-  <div class="row">
-	{% for ingredient in ingredient_list %}
-   		<div class="col-xl-3 col-md-6 mb-4">
-  			<div class="card border-left-primary shadow h-100 py-2">
-				<div class="card-body">
-					<div class="row no-gutters align-items-center">
-						<div class="col mr-2">
-							<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-								{{ingredient.description}}</div>
-							<div class="h5 mb-0 font-weight-bold text-gray-800">
-								<a class="text-rest" href="{% url 'ingredient_detail' ingredient.id %}">{{ ingredient.id }} {{ ingredient.name }}</a>
-							</div>
-                       </div>
-                   </div>
+	<div class="container">
+    	<div class="row justify-content-center">
+
+  		{% if ingredient_list %}
+		<!-- Content Column -->
+     	<div class="col-xl-10 col-lg-12 col-md-9">
+			<a href="{% url 'ingredient_create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                    {% trans "+ Ingredient" %}</a>
+			<a href="{% url 'add_recipe' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+              {% trans "+ Recipe" %}</a>
+			<a href="{% url 'provider_create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                    {% trans "+ Provider" %}</a>
+
+				<div class="card o-hidden border-0 shadow-lg my-5">
+              	<div class="card-body">
+				{% for ingredient in ingredient_list %}
+					<a href="{% url 'ingredient_detail' ingredient.id %}" >
+					<h2>{{ ingredient.name }} {{ ingredient.qty1 }} {{ ingredient.presentation }}  </h2></a><span
+					class="float-right">{{ ingredient.qty1 }} {{ ingredient.presentation }}  </span>
+                    	   <div class="progress mb-4">
+                        	   <div class="progress-bar bg-info" role="progressbar" style="width: 20%"
+                                           aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+
+							   </div>
 				</div>
-           </div>
-   		</div>
-	{% endfor %}
- </div>
 
-{% else %}
-<p/>No Ingredients found </p>
+    			{% endfor %}
 
-{% endif %}
+
+			  </div>
+	  		</div>
+  	 	</div>
+
+		{% else %}
+		<p/>No ingredients found </p>
+		{% endif %}
+		</div>
+	</div>
 {% endblock %}}

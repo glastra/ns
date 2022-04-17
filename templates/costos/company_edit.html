@@ -3,7 +3,7 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block meta_desc %} A&B Cost {% endblock %}
-{% block title %} A&B Cost - Ingredient Edit {% endblock %}
+{% block title %} A&B Cost - Company Edit {% endblock %}
 {%block content %}
  <body class="bg-gradient-primary">
     <div class="container">
@@ -16,7 +16,7 @@
                                 {% csrf_token %}
                                   {{ form.management_form }}
                                   {{ form.non_form_errors }}
-                                    <h3> {{ ingredient.name }}</h3>
+                                    <h3> {{ company.name }}</h3>
                                         {{ form | crispy }}
                                     <hr>
                                     {% for hidden_field in items_form.hidden_fields %}

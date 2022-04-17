@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+{% load i18n %}
+{%load static %}
 {% load static %}
+{% load djmoney%}
+
 <head>
 
     <meta charset="utf-8">
@@ -26,10 +29,8 @@
 
     <!-- Page Wrapper -->
     <div id="wrapper">
-
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-dark sidebar sidebar-dark accordion"  id="accordionSidebar">
-
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
                    <div class="sidebar-brand-icon rotate-n-15">
@@ -52,21 +53,21 @@
             <hr class="sidebar-divider">
 
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'RecetaViewList' %}">
+                <a class="nav-link" href="{% url 'recipe_list' %}">
                     <i class="fas fa-calculator"></i>
-                    <span>Recetas</span></a>
+                    <span>Recipes</span></a>
             </li>
 
 
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'IngredientViewList' %}">
+                <a class="nav-link" href="{% url 'ingredient_list' %}">
                      <i class="fas fa-book"></i>
                     <span>Ingredients</span></a>
             </li>
              <!-- Divider -->
             <hr class="sidebar-divider">
 
-            <!-- H8eading -->
+            <!-- Heading -->
             <div class="sidebar-heading">
                 Activities
             </div>
@@ -80,7 +81,7 @@
                 <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">New</h6>
-                        <a class="collapse-item" href="{% url 'add_receta' %}">Receta</a>
+                        <a class="collapse-item" href="{% url 'add_recipe' %}">Recipe</a>
                         <a class="collapse-item" href="{% url 'ingredient_create' %}">Ingredient</a>
                     </div>
                 </div>
@@ -105,8 +106,9 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Configuration:</h6>
-                        <a class="collapse-item" href="{% url 'restaurant_list' %}">Restaurants</a>
-                        <a class="collapse-item" href="{% url 'provider_list' %}">Providers</a>
+                        <a class="collapse-item" href="{% url 'company_list' %}">{% translate 'Company' %}</a>
+                        <a class="collapse-item" href="{% url 'restaurant_list' %}">{% translate 'Restaurant' %}</a>
+                        <a class="collapse-item" href="{% url 'provider_list' %}">Provider</a>
                     </div>
                 </div>
             </li>
@@ -304,7 +306,7 @@
                                     Activity Log
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                <a class="dropdown-item" href="{% url 'login' %}" data-toggle="modal" data-target="#logoutModal">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout
                                 </a>

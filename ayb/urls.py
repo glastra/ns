@@ -27,6 +27,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('__debug__/', include('debug_toolbar.urls')),
     path('', include('costos.urls')),
+    path('', include('django.conf.urls.i18n')),
     path('', include('django_registration.backends.activation.urls')),
     path('', include('django.contrib.auth.urls')),
 

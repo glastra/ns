@@ -1,6 +1,6 @@
 asgiref==3.4.1
 certifi==2021.10.8
-Django==4.0
+Django~=4.0.2
 django-debug-toolbar==3.2.4
 django-pgconnection==1.0.2
 django-pgtrigger==2.4.0
@@ -12,3 +12,10 @@ psycopg2==2.9.2
 python-dotenv==0.19.2
 python-gettext==4.0
 sqlparse==0.4.2
+
+py-moneyed~=1.2
+django-crispy-forms~=1.14.0
+sqlalchemy~=1.4.32
+pandas~=1.4.2
+matplotlib~=3.5.1
+pillow~=9.0.1

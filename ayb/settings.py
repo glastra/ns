@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
 from pathlib import Path
+import moneyed
 from django.db import models
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -46,6 +47,10 @@ INSTALLED_APPS = [
     'formtools',
     'account',
     'django_registration',
+    'django_quill',
+    'django_countries',
+    'djmoney',
+
 ]
 ACCOUNT_ACTIVATION_DAYS = 7
 
@@ -140,13 +145,42 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
+LANGUAGE_CODE = 'en'
+CURRENCIES = ('COP', 'USD')
+DEFAULT_CURRENCY = 'COP'
+CURRENCIES_PLACE = {'COP': 2, 'USD': 2}
+#CURRENCIES_PLACE = {'COP': 2, 'USD': 2, 'BTC': 8}
+CURRENCY_CHOICES = [('COP', 'COP $'), ('USD', 'USD $')]
+#CURRENCY_CHOICES = [('COP', 'COP $'), ('USD', 'USD $'), ('BTC', 'BTC B')]
 TIME_ZONE = 'UTC'
-
+#BASE_CURRENCY = 'COP'
 USE_I18N = True
-
 USE_TZ = True
+USE_L10N = True
+
+COUNTRIES_FIRST = ['COL', 'US']
+
+COP = moneyed.add_currency(
+    code='COP',
+    numeric='170',
+    name='Colombian Peso',
+    countries=('COLOMBIA', )
+)
+
+USD = moneyed.add_currency(
+    code='USD',
+    numeric='840',
+    name='US Dollar',
+    countries=('US', )
+)
+#
+# BTC = moneyed.add_currency(
+#     code='BTC',
+#     numeric='1000',
+#     name='Bitcoin',
+#     countries=('Bitcoin',),
+# )
+
 
 
 # Static files (CSS, JavaScript, Images)
@@ -156,6 +190,11 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 VENV_PATH = os.path.dirname(BASE_DIR)
 STATIC_ROOT = os.path.join(VENV_PATH, 'static_root')
+str = 'costos/fig'
+
+if not os.path.exists(str):
+    if not os.path.exists(str):
+        os.mkdir(str)
 
 
 # Default primary key field type
@@ -164,3 +203,25 @@ STATIC_ROOT = os.path.join(VENV_PATH, 'static_root')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'home'
 SITE_ID=1
+
+QUILL_CONFIGS = {
+    'default':{
+        'theme': 'snow',
+        'modules': {
+            'syntax': True,
+            'toolbar': [
+                [
+                    {'font': []},
+                    {'header': []},
+                    {'align': []},
+                    'bold', 'italic', 'underline', 'strike', 'blockquote',
+                    {'color': []},
+                    {'background': []},
+                ],
+                ['code-block', 'link'],
+                ['clean'],
+            ]
+        }
+    }
+}
+

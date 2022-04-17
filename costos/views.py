@@ -1,3 +1,14 @@
+import base64
+from PIL import Image
+from io import BytesIO
+import os
+import urllib
+from datetime import datetime
+from django.template.loader import get_template
+import pandas as pd
+
+import matplotlib.pyplot as plt
+import json
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login, authenticate, logout, get_user_model
@@ -7,12 +18,14 @@ from django.shortcuts import render, redirect, reverse, HttpResponseRedirect, ge
 from django.views.generic import (TemplateView, CreateView, DetailView, FormView)
 from django.views.generic.list import ListView
 from django.shortcuts import render
-from .models import Ingredient,  Receta, Restaurant, Provider, Steps
-from .forms import UserForm,  RestaurantForm, IngredientForm, StepsForm, ProviderForm, RecetaCreateForm
-from .forms import RecetaStepsFormset, NewUserForm, IngredientEditForm, ProviderIngredientsFormset
-
+from django.contrib.auth.decorators import login_required
+from .models import Ingredient,  Recipe, Restaurant, Provider, Step, Company
+from .forms import UserForm, RestaurantForm, IngredientForm, StepForm, ProviderForm, ProviderEditForm, CompanyEditForm, \
+    RecipeEditForm, StepCreateForm
+from .forms import RestaurantEditForm, NewUserForm, IngredientEditForm, ProviderIngredientsFormset, CompanyForm
 from django.views.generic.detail import SingleObjectMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+
 from formtools.wizard.views import WizardView
 
 
@@ -41,13 +54,78 @@ def user_create(request):
                   context)
 
 
+@login_required
+def company_create(request):
+
+    if request.method == 'POST':
+        form = CompanyForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('company_list')
+    else:
+        form = CompanyForm()
+    context = {
+        'form': form
+    }
+    return render(request, "costos/company_create.html", context)
+
+
+class CompanyListView(ListView):
+    model = Company
+    template_name = 'company_list.html'
+
+
+def company_detail(request, pk):
+    company = Company.objects.get(pk=pk)
+
+    if request.method == 'POST':
+        Company.save
+
+        return redirect('company_list')
+
+    return render(request, 'costos/company_detail.html', {'company': company})
+
+
+class CompanyEditView(SingleObjectMixin, FormView):
+
+    model = Provider
+    template_name = 'costos/company_edit.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Company.objects.all())
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Company.objects.all())
+        return super().post(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+         return CompanyEditForm(**self.get_form_kwargs(), instance=self.object)
+
+    def form_valid(self, form):
+        form.save()
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            'Changes made'
+        )
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('company_detail', kwargs={'pk': self.object.pk})
+
+
+
+
 class ProviderCreateView(CreateView):
     model = Provider
     template_name = 'costos/provider_create.html'
     fields = [
         'name',
-        'description',
         'email',
+        'description',
 
     ]
 
@@ -82,14 +160,43 @@ class ProviderListView(ListView):
     template_name = 'provider_list.html'
 
 
-def restaurant_create(request):
+class ProviderEditView(SingleObjectMixin, FormView):
 
+    model = Provider
+    template_name = 'costos/provider_edit.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Provider.objects.all())
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Provider.objects.all())
+        return super().post(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+         return ProviderEditForm(**self.get_form_kwargs(), instance=self.object)
+
+    def form_valid(self, form):
+        form.save()
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            'Changes made'
+        )
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('provider_detail', kwargs={'pk': self.object.pk})
+
+
+@login_required
+def restaurant_create(request):
     if request.method == 'POST':
         form = RestaurantForm(request.POST)
         if form.is_valid():
-            restaurant = form.save(commit=False)
-            restaurant.manager = request.user
-            restaurant.save()
+            form.save()
             return redirect('restaurant_list')
     else:
         form = RestaurantForm()
@@ -112,20 +219,52 @@ def restaurant_detail(request, pk):
     restaurant = Restaurant.objects.get(pk=pk)
 
     if request.method == 'POST':
-        Restaurant.save
+        restaurant.save
 
         return redirect('provider_list')
 
     return render(request, 'costos/restaurant_detail.html', {'restaurant': restaurant})
 
 
-def ingredient_create(request):
+class RestaurantEditView(SingleObjectMixin, FormView):
 
+    model = Provider
+    template_name = 'costos/company_edit.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Restaurant.objects.all())
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Restaurant.objects.all())
+        return super().post(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+         return RestaurantEditForm(**self.get_form_kwargs(), instance=self.object)
+
+    def form_valid(self, form):
+        form.save()
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            'Changes made'
+        )
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('restaurant_detail', kwargs={'pk': self.object.pk})
+
+
+def ingredient_create(request):
+    chef = request.user
     if request.method == 'POST':
         form = IngredientForm(request.POST)
         if form.is_valid():
             ingredient = form.save(commit=False)
-            ingredient.chef = request.user
+            ingredient.chef = chef
+           # ingredient.qty2 = ingredient.qty1 * ingredient.decrease
             ingredient.save()
             return redirect('ingredient_list')
     else:
@@ -145,6 +284,11 @@ def ingredient_detail(request, pk):
     ingredient = Ingredient.objects.get(pk=pk)
 
     if request.method == 'POST':
+        # temp = ingredient.qty1 - (ingredient.qty1 * ingredient.decrease)
+        # print(temp)
+        # if ingredient.qty2 != temp:
+        #     ingredient.qty2 = ingredient.qty1 - (ingredient.qty1 * ingredient.decrease)
+
         Ingredient.save
 
         return redirect('ingredient_list')
@@ -152,52 +296,191 @@ def ingredient_detail(request, pk):
     return render(request, 'costos/ingredient_detail.html', {'ingredient': ingredient})
 
 
-class RecetaCreateView(CreateView):
-    model = Receta
-    template_name = 'costos/receta_create.html'
-    fields = [
-        'name',
-        'portions',
-        'chef',
-        'restaurant',
-        'errormargin',
-        'items'
-    ]
+class IngredientEditView(SingleObjectMixin, FormView):
 
-    def is_valid(self, form):
+    model = Ingredient
+    template_name = 'costos/ingredient_edit.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Ingredient.objects.all())
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Ingredient.objects.all())
+        return super().post(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+         return IngredientEditForm( **self.get_form_kwargs(), instance=self.object)
+
+    def form_valid(self, form):
+        form.save()
 
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            'The receta has been added'
+            'Changes made on ingredient'
         )
 
-        return super().is_valid(form)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('ingredient_detail', kwargs={'pk': self.object.pk})
 
 
-class RecetaListView(ListView):
-    model = Receta
+def ingredient_table(request):
+        qs = Ingredient.objects.all()
+        ing = [{'Id': x.id, 'name': x.name, 'price': x.price} for x in qs]
+        df = pd.DataFrame(ing)
+
+        json_records = df.reset_index().to_json(orient='records')
+        data = []
+        data = json.loads(json_records)
+        context = {'df': data}
+        return render(request, 'costos/ingredient_table.html', context)
 
 
-class RecetaDetailView(DetailView):
-    model = Receta
-    template_name = 'costos/receta_detail.html'
+
+
+class RecipeCreateView(CreateView):
+    model = Recipe
+    template_name = 'costos/recipe_create.html'
+    fields = [
+        'name',
+        'portions',
+        'items'
+    ]
+
+
+class Recipe2CreateView(CreateView):
+        model = Recipe
+        template_name = 'costos/recipe_create.html'
+        fields = [
+            'restaurant',
+            'name',
+            'portions',
+        ]
+
+    # def is_valid(self, form):
+    #
+    #     messages.add_message(
+    #         self.request,
+    #         messages.SUCCESS,
+    #         'The Recipe has been added'
+    #     )
+    #     #response = super().form_valid()
+    #     return super().form_valid()
+
+
+class RecipeListView(ListView):
+    model = Recipe
+
+
+def recipe_table(request):
+
+    qs = Recipe.objects.filter(is_complete=False)
+    recipe = [{'Id': x.id, 'margin_error': x.margin_error, 'Portions': x.portions} for x in qs]
+    TS = datetime.now().strftime('%Y%m%d%H%M%S')
+    fname = '%s.png' % TS
+    df = pd.DataFrame(recipe)
+
+    json_records = df.reset_index().to_json(orient='records')
+    data = []
+    data = json.loads(json_records)
+
+    plt.figure()
+    df.plot(x='margin_error', y='Portions', kind='scatter')
+    plt.savefig(os.path.join('costos/fig', fname), bbox_inches='tight')
+    #  plt.show()
+
+    context = {'df': data}
+    return render(request, 'costos/recipe_table.html', context)
+
+
+def recipe_image(request):
+
+    qs = Recipe.objects.filter(is_complete=False)
+    recipe = [{'Id': x.id, 'margin_error': x.margin_error, 'Portions': x.portions} for x in qs]
+    TS = datetime.now().strftime('%Y%m%d%H%M%S')
+    fname = '%s.png' % TS
+    df = pd.DataFrame(recipe)
+
+    json_records = df.reset_index().to_json(orient='records')
+    data = []
+    data = json.loads(json_records)
+   # buf = io.BytesIO()
+    plt.figure()
+    df.plot(x='margin_error', y='Portions', kind='scatter')
+    plt.savefig(os.path.join('costos/fig', fname), format='png', transparent=True, quality=100, dpi=200 )
+  #  buf.seek(0)
+    with open(os.path.join('costos/fig', fname), "rb") as image_file:
+        data = base64.b64encode(image_file.read())
+
+    im = Image.open(BytesIO(base64.b64decode(data)))
+
+
+    imsrc = base64.b64encode(im.read())
+    imuri = 'data:image/png;base64,{}'.format(urllib.parse.quote(imsrc))
+    context = {'plot': imuri}
+
+    template = get_template('costos/recipe_image.html')
+    html = template.render(context=context)
+    return HttpResponse(html)
+
+    #return render(request, 'costos/recipe_image.html', context)
+
+
+class RecipeDetailView(DetailView):
+    model = Recipe
+    template_name = 'costos/recipe_detail.html'
 
     def form_valid(self, form):
 
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            'The receta has been added'
+            'The Recipe has been added'
         )
 
         return super().form_valid(form)
 
 
+
+class RecipeEditView(SingleObjectMixin, FormView):
+
+    model = Recipe
+    template_name = 'costos/recipe_edit.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Recipe.objects.all())
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Recipe.objects.all())
+        return super().post(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+         return RecipeEditForm(**self.get_form_kwargs(), instance=self.object)
+
+    def form_valid(self, form):
+        form.save()
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            'Changes made on recipe'
+        )
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('recipe_detail', kwargs={'pk': self.object.pk})
+
+
+
 def steps_create(request):
 
     if request.method == 'POST':
-        form = StepsForm(request.POST)
+        form = StepForm(request.POST)
         if form.is_valid():
             steps = form.save(commit=False)
             ing = steps.ingredient
@@ -205,29 +488,55 @@ def steps_create(request):
             steps.cost_waste = (steps.cost_gmu * steps.error)/100
             steps.cost_total = (steps.cost_gmu * steps.qty) + steps.cost_waste
             steps.save()
-            return redirect('index')
+            return redirect('recipe_detail')
     else:
-        form = StepsForm()
+        form = StepForm()
     context = {
         'form': form
     }
-    return render(request, "costos/steps_create.html", context)
+    return render(request, "costos/step_create.html", context)
+
+
+def recipe_step_create(request, pk):
+    recipe = Recipe.objects.get(pk=pk)
+    recipe.save()
+    if request.method == 'POST':
+        recipe.save()
+        form = StepCreateForm(request.POST)
+        if form.is_valid():
+            recipe = form.save()
+            steps = form.save(commit=False)
+            steps.recipe = recipe
+
+            # ing = steps.ingredient
+            # steps.cost_gmu = ing.price * ing.qty
+            # steps.cost_waste = (steps.cost_gmu * steps.error)/100
+            # steps.cost_total = (steps.cost_gmu * steps.qty) + steps.cost_waste
+            # recipe.cost = steps.cost_total
+            steps.save()
+            recipe.save()
+            return redirect('steps_list', recipe.pk)
+    else:
+        form = StepCreateForm()
+    context = {
+        'form': form
+    }
+    return render(request, "costos/step_create.html", context)
 
 
 def steps_detail(request, pk):
-    steps = Steps.objects.get(pk=pk)
+    steps = Step.objects.get(pk=pk)
 
     if request.method == 'POST':
-        Steps.save
+        Step.save
 
         return redirect('steps_list')
 
-    return render(request, 'costos/steps_detail.html', {'steps': steps})
-
+    return render(request, 'costos/step_detail.html', {'steps': steps})
 
 
 class StepListView(ListView):
-    model = Steps
+    model = Step
     template_name = 'steps_list'
 
 
@@ -241,7 +550,7 @@ def login_request(request):
             if user is not None:
                 login(request, user)
                 messages.info(request, f"You are now logged in as {username}.")
-                return redirect("index")
+                return redirect("home")
             else:
                 messages.error(request, "Invalid username or password.")
         else:
@@ -259,7 +568,7 @@ def register_request(request):
             login(request, user)
             print('saved')
             messages.success(request, "Registration Successful")
-            return redirect("index")
+            return redirect("login")
         messages.error(request, "Registration Unsuccessful")
     print('could not save')
     form = NewUserForm()
@@ -273,145 +582,36 @@ def logout_view(request):
 def forgot_password(request):
     return render(request, 'costos/forgot_password.html')
 
-#
-# class CompanyListView(ListView):
-#     model = Company
-#
-#
-# def company_create(request):
-#     form = CompanyForm(request.POST or None)
-#     if form.is_valid():
-#         form.save()
-#     context = {
-#         'form': form
-#     }
-#     return render(request, "costos/company_create.html",
-#                   context)
-#
-#
-# def company_detail(request, pk):
-#     company = Company.objects.get(pk=pk)
-#
-#     if request.method == 'POST':
-#         Provider.save()
-#
-#         return redirect('provider_list')
-#     return render(request, 'costos/company_detail.html', {'company': company})
-
 
 def dashboard(request):
     return render(request, 'costos/dashboard.html')
 
 
-class RecetaStepsEditView(SingleObjectMixin, FormView):
 
-    model = Receta
-    template_name = 'costos/receta_steps_update.html'
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=Receta.objects.all())
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=Receta.objects.all())
-        return super().post(request, *args, **kwargs)
-
-    def get_form(self, form_class=None):
-        return RecetaStepsFormset(**self.get_form_kwargs(), instance=self.object)
-
-    def form_valid(self, form):
-        form.save()
-
-        messages.add_message(
-            self.request,
-            messages.SUCCESS,
-            'Changes made'
-        )
-
-        return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse('receta_detail', kwargs={'pk': self.object.pk})
-
-
-# def receta_steps_update(request, pk):
-#     receta = get_object_or_404(Receta, pk=pk)
-#     form = RecetaCreateForm(request.POST or None, instance=receta)
-#     RecetaStepsFormset = modelformset_factory(Steps, form=StepsForm, extra=2)
-#     qs = receta.items.all()
-#     formset = RecetaStepsFormset(request.POST or None, queryset=qs)
-#     context = {
-#         'form': form,
-#         'formset': formset,
-#         'object': receta
-#     }
-#     if request.method == "POST":
-#        print(request.POST)
-#     if all([form.is_valid(), formset.is_valid()]):
-#         parent = form.save(commit=False)
-#         parent.save()
-#         for form in formset:
-#             child = form.save(commit=False)
-#             child.receta = parent
-#             child.save()
-#         context['message'] = 'Data saved'
-#     return render(request, "costos/receta_steps_update.html", context)
-
-
-
-def receta_steps_update(request, pk):
-    receta = get_object_or_404(Receta, pk=pk)
-    RecetaStepsFormset = inlineformset_factory(Receta, Steps, fields=('ingredient','qty',))
+def recipe_step_update(request, pk):
+    recipe = get_object_or_404(Recipe, pk=pk)
+    recipestepformset = inlineformset_factory(Recipe, Step, fields=('ingredient', 'qty1', ))
 
     if request.method == "POST":
         print(request.POST)
-        formset = RecetaStepsFormset(request.POST, instance=receta)
+        formset = recipestepformset(request.POST, instance=recipe)
+     #   helper = StepFormSetHelper()
         if formset.is_valid():
             formset.save()
+            return redirect('recipe_detail', recipe.pk)
 
-            return redirect('receta_detail', receta.pk)
+    formset = recipestepformset(instance=recipe)
 
-    formset = RecetaStepsFormset(instance=receta)
-
-    return render(request, "costos/receta_steps_update.html", {'formset': formset})
-
+    return render(request, "costos/recipe_steps_update.html", {'formset': formset})
 
 
-class IngredientEditView(SingleObjectMixin, FormView):
 
-    model = Ingredient
-    template_name = 'costos/ingredient_edit.html'
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=Ingredient.objects.all())
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=Ingredient.objects.all())
-        return super().post(request, *args, **kwargs)
-
-    def get_form(self, form_class=None):
-         return IngredientEditForm(**self.get_form_kwargs(), instance=self.object)
-
-    def form_valid(self, form):
-        form.save()
-
-        messages.add_message(
-            self.request,
-            messages.SUCCESS,
-            'Changes made'
-        )
-
-        return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse('ingredient_detail', kwargs={'pk': self.object.pk})
 
 
 class ProviderIngredientsEditView(SingleObjectMixin, FormView):
 
     model = Provider
-    template_name = 'costos/provider_ingredients_edit.html'
+    template_name = 'costos/provider_ingredient_update.html'
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=Provider.objects.all())
@@ -439,7 +639,7 @@ class ProviderIngredientsEditView(SingleObjectMixin, FormView):
         return reverse('provider_detail', kwargs={'pk': self.object.pk})
 
 
-def provider_ingredients_edit(request, provider_pk, ingredient_pk, *args, **kwargs):
+def provider_ingredients_edit(request, provider_pk, ingredient_pk):
     provider = get_object_or_404(Provider, pk=provider_pk)
     ingredient = get_object_or_404(Ingredient, pk=ingredient_pk, provider=provider)
 
@@ -466,9 +666,31 @@ def provider_ingredients_edit(request, provider_pk, ingredient_pk, *args, **kwar
             form = ProviderForm(instance=provider)
             formset = IngredientFormSet(instance=provider)
 
-        return render(request, 'costos/provider_ingredients_edit.html', {
+        return render(request, 'costos/provider_ingredient_update.html', {
             'provider': provider,
             'ingredient': ingredient,
             'form': form,
             'formset': formset
         })
+    
+    
+def provider_ingredient_update(request, pk):
+    provider = get_object_or_404(Provider, pk=pk)
+    provider_ingredient_formset = inlineformset_factory(Provider, Ingredient, fields=('name', 'presentation','price',
+                                                                                      'qty1', 'decrease', 'qty2'))
+
+    if request.method == "POST":
+        print(request.POST)
+        formset = provider_ingredient_formset(request.POST, instance=provider)
+        if formset.is_valid():
+            formset.save()
+
+            return redirect('provider_detail', provider.pk)
+
+    formset = provider_ingredient_formset(instance=provider)
+
+    return render(request, "costos/provider_ingredient_update.html", {
+        'provider': provider,
+        'formset': formset
+
+    })

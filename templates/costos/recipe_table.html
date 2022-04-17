@@ -1,0 +1,36 @@
+{% extends 'costos/base.html' %}
+{% load i18n %}
+{%load static %}
+{% block meta_desc %} A&B Cost {% endblock %}
+{% block title %} A&B Cost - Table {% endblock %}
+{%block content %}
+	<div class="container">
+    	<div class="row justify-content-center">
+            <div>
+              <body>
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>Recipe Error</th>
+                        <th>Portions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- jinja2 Technique -->
+                    {% if df %}
+
+                    {% for i in df %}
+                    <tr>
+                        <td>{{i.margin_error}}</td>
+                        <td>{{i.Portions}}</td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                    </tbody>
+                </table>
+
+            </body>
+            </div>
+        </div>
+    </div>
+{% endblock %}}

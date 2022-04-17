@@ -3,10 +3,10 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block meta_desc %} A&B Cost {% endblock %}
-{% block title %} A&B Cost - Ingredient Edit {% endblock %}
+{% block title %} A&B Cost - Restaurant Edit {% endblock %}
 {%block content %}
  <body class="bg-gradient-primary">
-    <div class="container">
+    <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-xl-10 col-lg-12 col-md-9">
                 <div class="card o-hidden border-0 shadow-lg my-5">
@@ -16,7 +16,7 @@
                                 {% csrf_token %}
                                   {{ form.management_form }}
                                   {{ form.non_form_errors }}
-                                    <h3> {{ ingredient.name }}</h3>
+                                    <h3> {{ restaurant.name }}</h3>
                                         {{ form | crispy }}
                                     <hr>
                                     {% for hidden_field in items_form.hidden_fields %}
@@ -24,7 +24,7 @@
                                     {% endfor %}
                                     <p>
                                         <button type="submit" class="btn btn-primary w-100 mb-2">{% translate "Save" %}</button>
-                                        <a href="{{request.META.HTTP_REFERER}}" role="button" class="btn btn-secondary w-100">Cancel</a>
+                                        <a href="{% url 'restaurant_list' %}" role="button" class="btn btn-secondary w-100">Cancel</a>
                                     </p>
                               </form>
                         </div>

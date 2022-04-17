@@ -5,6 +5,7 @@
 {% block meta_desc %} A&B Cost {% endblock %}
 {% block title %} A&B Cost - Login {% endblock %}
 {%block content %}
+
 <body class="bg-gradient-primary">
     <div class="container">
         <!-- Outer Row -->
@@ -16,11 +17,15 @@
                     <div class="card-body p-0">
                         <!-- Nested Row within Card Body -->
                         <div class="row">
-                            <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+                            <div class="col-lg-6 d-none d-lg-block ">
+                                 <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;"
+                                            src="{% static 'img/undraw_login_re_4vu2.svg' %}" alt="...">
+                            </div>
                             <div class="col-lg-6">
                                 <div class="p-5">
                                     <div class="text-center">
-                                        <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                                         <img class="img-fluid" src="{% static 'img/s-ayblogo.png' %}" alt="...">
+                                        <h1 class="h4 text-gray-900 mb-4">{% translate 'Welcome Back!' %}</h1>
                                     </div>
 
                                     <form method="POST">
