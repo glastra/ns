@@ -208,8 +208,8 @@ class Restaurant(models.Model):
     )
     decrease = models.FloatField(
         _('decrease'),
-        default=0.01,
-        validators=[validate_min_percentage, validate_max_percentage]
+        default=0.00,
+        validators=[validate_max_percentage]
     )
     raw_cost = models.DecimalField(
         _('material cost'),
@@ -379,6 +379,7 @@ class Provider(models.Model):
 
 
 class Ingredient(models.Model):
+
     ANONYMOUS_USER_ID = 1
     GRAM = "gram"
     UNIT = "unit"
@@ -495,7 +496,7 @@ class Ingredient(models.Model):
     decrease = models.FloatField(
         _('decrease'),
         default=0.1,
-        validators=[validate_min_percentage, validate_max_percentage]
+        validators=[validate_max_percentage]
     )
 
     created_on = models.DateTimeField(
@@ -509,6 +510,7 @@ class Ingredient(models.Model):
     is_track = models.BooleanField(
         default=False,
     )
+    objects = models.Manager()
 
     def __str__(self):
         return self.name
@@ -526,14 +528,18 @@ class Ingredient(models.Model):
             'pk': self.pk
         })
 
+
     @property
     def get_decrease_qty(self):
-        print(self.decrease)
         return float(self.qty1) - (float(self.qty1) * self.decrease)
 
     @property
     def get_decrease_percent(self):
         return 100 * abs(self.qty2 - self.qty1) / self.qty1
+
+    @property
+    def get_efficiency(self):
+        return abs(100-self.decrease)
 
     @property
     def cost_gmu(self):
@@ -712,8 +718,6 @@ class Recipe(models.Model):
     def save(self, *args, **kwargs):
         if not self.id:
             super(Recipe, self).save(*args, **kwargs)
-
-        self.cost = self.cal_cost
         super(Recipe, self).save(*args, **kwargs)
 
         super(Recipe, self).save()
@@ -726,7 +730,6 @@ class Recipe(models.Model):
     @classmethod
     def create(cls, name, items):
         recipe = cls(name=name, items=items)
-
         # do something with the recipe
         return recipe
 
@@ -734,22 +737,27 @@ class Recipe(models.Model):
     def cal_cost(self):
         s = self.items
         result = s.aggregate(sum=Sum('cost'))['sum']
-        return f"${result:,.2f}"
+    #    return f"${result:,.2f}"
+        return result
 
     @property
     def cal_portion_cost(self):
         s = self.items
         result = s.aggregate(sum=Sum('cost'))['sum']
         result = float(result / self.portions)
-        return f"${result:,.2f}"
+        #return f"${result:,.2f}"
+        return result
 
     @property
     def cal_error(self):
         s = self.items
         result = s.aggregate(sum=Sum('cost'))['sum']
-        result = float(result * (self.margin_error / 100))
-        return f"${result:,.2f}"
-
+        print(result)
+        print(self.cal_portion_cost)
+        temp = float(self.margin_error / 100)
+        result = float(result) * temp
+        #return f"${result:,.2f}"
+        return result
 
     @property
     def cal_prep_cost(self):
@@ -757,7 +765,41 @@ class Recipe(models.Model):
         result = s.aggregate(sum=Sum('cost'))['sum']
         error = float(result * (self.margin_error / 100))
         final = float(result) + float(error)
-        return f"${final:,.2f}"
+        #return f"${final:,.2f}"
+        return final
+
+
+    @property
+    def cal_pot_price(self):
+        s = self.items
+        result = s.aggregate(sum=Sum('cost'))['sum']
+        error = float(result * (self.margin_error / 100))
+        final = float(result) + float(error)
+        #return f"${final:,.2f}"
+        return final
+
+
+    @property
+    def cal_tax(self):
+        s = self.items
+        result = s.aggregate(sum=Sum('cost'))['sum']
+        error = float(result * (self.margin_error / 100))
+        final = float(result) + float(error)
+        tax = final * float(7/100)
+        #return f"${final:,.2f}"
+        return tax
+
+
+    @property
+    def cal_sale_price(self):
+        s = self.items
+        result = s.aggregate(sum=Sum('cost'))['sum']
+        error = float(result * (self.margin_error / 100))
+        final = float(result) + float(error)
+        tax = final * float(7 / 100)
+        final = tax + final
+        # return f"${final:,.2f}"
+        return final
 
 
 class Step(models.Model):
@@ -849,6 +891,7 @@ class Step(models.Model):
     def calculate_cost(self):
         ing = self.ingredient
         result = self.qty1 * ing.cost
-        return f"${result:,.2f}"
+        #return f"${result:,.2f}"
+        return result
 
 

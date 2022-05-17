@@ -5,9 +5,10 @@ urlpatterns = [
       # path('', views.index, name='index'),
 
       path('', views.HomeView.as_view(), name='home'),
-      path('table/', views.recipe_table, name='recipe_table'),
-      path('table2/', views.ingredient_table, name='ingredient_table'),
-      path('image/', views.recipe_image, name='ingredient_image'),
+      path('table/', views.recipe_decrease_scatter, name='recipe_table'),
+      path('bar/', views.recipe_costbar, name='recipe_costbar'),
+      path('table2/', views.ingredient_type_pie, name='ingredient_table'),
+   #   path('image/', views.recipe_image, name='ingredient_image'),
       path('login/', views.login_request, name="login"),
       # path('accounts/logout/', name="logout"),
       # path('accounts/password_change/', name="password_change"),

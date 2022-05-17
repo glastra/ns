@@ -47,13 +47,13 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="text-center">
-                                        <p>Total {{recipe.cal_cost}}</p>
-                                        <p>Margin Error Cost {{recipe.cal_error}}</p>
-                                        <p>Preparation Cost {{recipe.cal_prep_cost}}</p>
-                                        <p>Portion Cost {{recipe.cal_portion_cost}}</p>
-                                        <p>Potential Price {{recipe.cal_portion_cost}}</p>
-                                        <p>Tax {{recipe.cal_portion_cost}}</p>
-                                        <p>Suggested Sale Price {{recipe.cal_portion_cost}}</p>
+                                        <p>Total {{recipe.cal_cost|floatformat:2}}</p>
+                                        <p>Margin Error Cost {{recipe.cal_error|floatformat:2}}</p>
+                                        <p>Preparation Cost {{recipe.cal_prep_cost|floatformat:2}}</p>
+                                        <p>Portion Cost {{recipe.cal_portion_cost|floatformat:2}}</p>
+                                        <p>Potential Price {{recipe.cal_pot_price|floatformat:4}}</p>
+                                        <p>Tax {{recipe.cal_tax|floatformat:2}}</p>
+                                        <p>Suggested Sale Price {{recipe.cal_sale_price|floatformat:2}}</p>
                                     </div>
 
                                 </div>

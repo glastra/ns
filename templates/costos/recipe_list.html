@@ -21,18 +21,22 @@
             </div>
 
 				<div class="card o-hidden border-0 shadow-lg my-5">
-              	<div class="card-body">
-				{% for recipe in recipe_list %}
-				  <a class="text-rest" href="{% url 'recipe_detail' recipe.id %}">{{ recipe.name }}</a><span
-                	   class="float-right">{{ recipe.cost}}</span></h4>
-                    	   <div class="progress mb-4">
-                        	   <div class="progress-bar bg-info" role="progressbar" style="width: 20%"
-                                           aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+						<h6 class="m-0 font-weight-bold text-primary">
+							Recipes</h6>
+					</div>
+					<div class="card-body">
+						{% for recipe in recipe_list %}
+					  	<a class="text-rest" href="{% url 'recipe_detail' recipe.id %}">{{ recipe.name }} </a><span
+						   class="float-right"> {{ recipe.portions }} {{ recipe.cal_cost}}</span></h4>
+							   <div class="progress mb-4">
+								   <div class="progress-bar bg-info" role="progressbar" style="width: 20%"
+											   aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+								   </div>
 							   </div>
-						   </div>
 
-    			{% endfor %}
-			  </div>
+						{% endfor %}
+				  	</div>
 	  		</div>
   	 	</div>
 

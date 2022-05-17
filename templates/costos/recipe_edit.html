@@ -10,6 +10,12 @@
 </head>
  <body class="bg-gradient-primary">
     <div class="container">
+        <a href="{{request.META.HTTP_REFERER}}" class="d-none d-sm-inline-block btn btn-sm  shadow-sm">
+                    {% trans "< Go Back" %}</a>
+        <a href="{% url 'provider_create' %}" class="d-none d-sm-inline-block btn btn-sm shadow-sm">
+                    {% trans "+ Provider" %}</a>
+        <a href="{% url 'ingredient_create' %}" class="d-none d-sm-inline-block btn btn-sm shadow-sm">
+                    {% trans "+ Ingredient" %}</a>
         <div class="row justify-content-center">
             <div class="col-xl-10 col-lg-12 col-md-9">
                 <div class="card o-hidden border-0 shadow-lg my-5">
@@ -27,7 +33,9 @@
                                     {% endfor %}
                                     <p>
                                         <button type="submit" class="btn btn-primary w-100 mb-2">{% translate "Save" %}</button>
-                                        <a href="{{request.META.HTTP_REFERER}}" role="button" class="btn btn-secondary w-100">Cancel</a>
+                                        <br>
+                                        <a href="{% url 'recipe_step_update' recipe.pk %}" role="button" class="btn btn-secondary w-100">Edit Ingredients</a>
+
                                     </p>
                               </form>
                         </div>

@@ -1,20 +1,20 @@
-import base64
-from PIL import Image
-from io import BytesIO
 import os
-import urllib
-from datetime import datetime
-from django.template.loader import get_template
-import pandas as pd
-
-import matplotlib.pyplot as plt
 import json
+
+import matplotlib
+import matplotlib.pyplot as plt
+#import numpy as np
+import pandas as pd
+#import cufflinks as cf
+
+
+from django.db.models import Count
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
-from django.forms import ModelForm, inlineformset_factory, modelformset_factory
-from django.shortcuts import render, redirect, reverse, HttpResponseRedirect, get_object_or_404
+from django.forms import inlineformset_factory
+from django.shortcuts import redirect, reverse, get_object_or_404
 from django.views.generic import (TemplateView, CreateView, DetailView, FormView)
 from django.views.generic.list import ListView
 from django.shortcuts import render
@@ -24,9 +24,9 @@ from .forms import UserForm, RestaurantForm, IngredientForm, StepForm, ProviderF
     RecipeEditForm, StepCreateForm
 from .forms import RestaurantEditForm, NewUserForm, IngredientEditForm, ProviderIngredientsFormset, CompanyForm
 from django.views.generic.detail import SingleObjectMixin
-from django.http import HttpResponseRedirect, HttpResponse
-
-from formtools.wizard.views import WizardView
+from django.http import HttpResponseRedirect
+# from plotly.offline import download_plotlyjs, init_notebook_mode,plot,iplot
+# init_notebook_mode(connected=True)
 
 
 # Create your views here.
@@ -327,18 +327,46 @@ class IngredientEditView(SingleObjectMixin, FormView):
         return reverse('ingredient_detail', kwargs={'pk': self.object.pk})
 
 
-def ingredient_table(request):
-        qs = Ingredient.objects.all()
-        ing = [{'Id': x.id, 'name': x.name, 'price': x.price} for x in qs]
-        df = pd.DataFrame(ing)
-
-        json_records = df.reset_index().to_json(orient='records')
-        data = []
-        data = json.loads(json_records)
-        context = {'df': data}
-        return render(request, 'costos/ingredient_table.html', context)
+# def ingredient_type_pl(request):
+#     arr_1 = np.random.randn(50,4)
+#     df_1 = pd.DataFrame(arr_1, columns=['A','B','C','D'])
+#     df_1.head()
+#     df_1.plot()
 
 
+def ingredient_type_pie(request):
+    rategro = 0.0
+    ratepro = 0.0
+    ratefru = 0.0
+    labels = 'grocery','protein','fruVer'
+    label_type1 = 'protein'
+    label_type2 = 'fruVer'
+    label_type3 = 'grocery'
+    # Creating color parameters
+    colors = ("#4e73df", "#1cc88a", "#36b9cc")
+    allint = Ingredient.objects.count()
+    qs = Ingredient.objects.all().values('type').annotate(total=Count('id')).order_by('type')
+
+    for q in qs:
+        value = q['type']
+        total = q['total']
+        if value == label_type1:
+            ratepro = total / allint
+        if value == label_type2:
+            ratefru = total / allint
+        if value == label_type3:
+            rategro = total / allint
+
+    df = pd.DataFrame({'Name': ['grocery', 'protein','fruVer'],
+                        'ing_type': [rategro, ratepro, ratefru]
+                        }
+                       )
+
+    df = df.plot(kind='pie', y='ing_type', autopct='%1.0f%%', labels=labels, colors=colors)
+    fname = 'ingredientepie.png'
+    plt.savefig(os.path.join('costos/fig', fname))
+    context = {'df': fname}
+    return render(request, 'costos/ingredient_table.html', context)
 
 
 class RecipeCreateView(CreateView):
@@ -375,12 +403,12 @@ class RecipeListView(ListView):
     model = Recipe
 
 
-def recipe_table(request):
+def recipe_decrease_scatter(request):
 
     qs = Recipe.objects.filter(is_complete=False)
     recipe = [{'Id': x.id, 'margin_error': x.margin_error, 'Portions': x.portions} for x in qs]
-    TS = datetime.now().strftime('%Y%m%d%H%M%S')
-    fname = '%s.png' % TS
+    #TS = datetime.now().strftime('%Y%m%d%H%M%S')
+    fname = 'recipeerror.png'
     df = pd.DataFrame(recipe)
 
     json_records = df.reset_index().to_json(orient='records')
@@ -395,38 +423,43 @@ def recipe_table(request):
     context = {'df': data}
     return render(request, 'costos/recipe_table.html', context)
 
-
-def recipe_image(request):
+def recipe_costbar(request):
 
     qs = Recipe.objects.filter(is_complete=False)
-    recipe = [{'Id': x.id, 'margin_error': x.margin_error, 'Portions': x.portions} for x in qs]
-    TS = datetime.now().strftime('%Y%m%d%H%M%S')
-    fname = '%s.png' % TS
+
+    recipe = [{'name': x.name, 'cost': float(x.cost.amount)} for x in qs]
+    print(recipe)
+    #TS = datetime.now().strftime('%Y%m%d%H%M%S')
+    fname = 'recipecostbar.png'
     df = pd.DataFrame(recipe)
 
     json_records = df.reset_index().to_json(orient='records')
     data = []
     data = json.loads(json_records)
-   # buf = io.BytesIO()
-    plt.figure()
-    df.plot(x='margin_error', y='Portions', kind='scatter')
-    plt.savefig(os.path.join('costos/fig', fname), format='png', transparent=True, quality=100, dpi=200 )
-  #  buf.seek(0)
-    with open(os.path.join('costos/fig', fname), "rb") as image_file:
-        data = base64.b64encode(image_file.read())
 
-    im = Image.open(BytesIO(base64.b64decode(data)))
+   # plt.figure()
+    df.plot(x='name', y='cost', kind='bar')
+    plt.savefig(os.path.join('costos/fig', fname), bbox_inches='tight')
+    #  plt.show()
 
+    context = {'df': data}
+    return render(request, 'costos/recipe_costbar.html', context)
 
-    imsrc = base64.b64encode(im.read())
-    imuri = 'data:image/png;base64,{}'.format(urllib.parse.quote(imsrc))
-    context = {'plot': imuri}
+#
+# x = ['one', 'two', 'three', 'four', 'five']
+#
+# # giving the values against
+# # each value at x axis
+# y = [5, 24, 35, 67, 12]
+# plt.bar(x, y)
+#
+# # setting x-label as pen sold
+# plt.xlabel("pen sold")
+#
+# # setting y_label as price
+# plt.ylabel("price")
+# plt.title(" Vertical bar graph")
 
-    template = get_template('costos/recipe_image.html')
-    html = template.render(context=context)
-    return HttpResponse(html)
-
-    #return render(request, 'costos/recipe_image.html', context)
 
 
 class RecipeDetailView(DetailView):

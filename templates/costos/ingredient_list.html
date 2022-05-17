@@ -21,14 +21,16 @@
 				<div class="card o-hidden border-0 shadow-lg my-5">
               	<div class="card-body">
 				{% for ingredient in ingredient_list %}
+					{{ ingredient.type }} by  {{ ingredient.provider }}
 					<a href="{% url 'ingredient_detail' ingredient.id %}" >
-					<h2>{{ ingredient.name }} {{ ingredient.qty1 }} {{ ingredient.presentation }}  </h2></a><span
-					class="float-right">{{ ingredient.qty1 }} {{ ingredient.presentation }}  </span>
+					<h2>{{ ingredient.name }} {{ ingredient.qty1 }} {{ ingredient.presentation }} </h2></a><span
+					class="float-right">{{ ingredient.get_efficiency }}  </span>
                     	   <div class="progress mb-4">
-                        	   <div class="progress-bar bg-info" role="progressbar" style="width: 20%"
+                        	   <div class="progress-bar bg-info" role="progressbar" style="width: {{ ingredient.get_efficiency }}%"
                                            aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
 
 							   </div>
+
 				</div>
 
     			{% endfor %}

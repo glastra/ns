@@ -266,6 +266,27 @@ class RecipeEditForm(forms.ModelForm):
         ]
         widgets = {'description': QuillFieldForm()}
 
+    # def __init__(self, *args, **kwargs):
+    #     super(RecipeEditForm, self).__init__(*args, **kwargs)
+    #     if self.instance.pk:
+    #         self.fields['items'].initial = \
+    #             self.instance.items_set.all().select_subclasses()
+    #
+    # def save(self, commit=True):
+    #     recipe = super(RecipeEditForm, self).save(commit=False)
+    #     recipe.save()
+    #     # recipe.items_set = self.cleaned_data['items']
+    #     # self.save_m2m()
+    #     return recipe
+
+
+    # def duplicate(self):
+    #     recipe = Recipe.objects.get(pk=pkofquiziwanttocopy)
+    #     quiz.pk = None
+    #     quiz.save()
+    #     old_quiz = Quiz.objects.get(pk=pkofquiziwanttocopy)
+    #
+    #     quiz.question_set = old_quiz.question_set.all()
 
 class StepForm(forms.ModelForm):
 
